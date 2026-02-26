@@ -1,5 +1,8 @@
 # Terraform Associate Study Guide
 
+##
+This has been updated and amended to remove the AWS components and change them for Azure components to fit in-line with and understanding of Terraforom alongside a provider I use regularly.  This won't change the actual fundamentals of this repo but rather may help more Azure focused people to understand some of the contents.
+
 A collection of hands-on notes, labs, and explanations created while studying for the **HashiCorp Certified: Terraform Associate** exam.  
 This repository focuses on real-world understanding — not just passing the test — by connecting concepts like state, variables, modules, and backends to how they're used in AWS environments.
 
