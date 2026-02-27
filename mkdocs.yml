@@ -16,3 +16,5 @@ markdown_extensions:
 
 docs_dir: content 
 site_dir: docs
+site_url: https://rcoupland91.github.io/azure-terraform-associate-study/
+use_directory_urls: true
