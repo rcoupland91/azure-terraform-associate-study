@@ -1,11 +1,11 @@
-site_name: My Code Library
+site_name: Hashipcorp Terraform Associate Study Guide
 theme:
   name: material
   palette: 
     scheme: slate # Dark mode is usually better for code
   features:
     - content.code.copy
-    - navigation.expand
+    - navigation.prune
 
 markdown_extensions:
   - pymdownx.highlight:
