@@ -1,0 +1,2339 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../02-advanced-terraform-features/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>State Management - My Code Library</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#state-management" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="My Code Library" class="md-header__button md-logo" aria-label="My Code Library" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            My Code Library
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              State Management
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="My Code Library" class="md-nav__button md-logo" aria-label="My Code Library" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    My Code Library
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    00 Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../00-Getting-Started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started with Terraform Associate Prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../00-Getting-Started/01-intro-to-terraform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction to Terraform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../00-Getting-Started/02-automating-azure-deployments-with-terraform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automating Azure Deployments with Terraform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../00-Getting-Started/03-troubleshooting-and-debugging-terraform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting and Debugging Terraform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 Understand Infrastructure as Code
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 Understand Infrastructure as Code
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-Understand-Infrastructure-as-Code/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Understanding Infrastructure as Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 Terraform Basics and CLI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 Terraform Basics and CLI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-Terraform-Basics-and-CLI/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terraform Basics and CLI Mastery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-Terraform-Basics-and-CLI/01-terraform-cli-commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terraform CLI Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-Terraform-Basics-and-CLI/02-resource-targeting-and-import/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resource Targeting And Import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 Terraform Configuration Language
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 Terraform Configuration Language
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terraform Configuration Language
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/01-variables-and-outputs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables And Outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/02-for-each-vs-count/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    For Each Vs Count
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/03-lifecycle-blocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lifecycle Blocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/04-custom-validation-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 - Custom Validation Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/05-ephemeral-values-write-only/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 - Ephemeral Values and Write-Only Arguments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 Modules and Dependency Management
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 Modules and Dependency Management
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-Modules-and-Dependency-Management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modules and Dependency Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-Modules-and-Dependency-Management/01-modules-and-backends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modules And Backends
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 State Backends and Workspaces
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 State Backends and Workspaces
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State, Backends, and Workspaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Management
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#learning-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning Objectives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-terraform-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧩 1. What Is Terraform State?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🧩 1. What Is Terraform State?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#you-must-be-able-to-say-this-cleanly-in-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        You must be able to say this cleanly in interviews
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-local-vs-remote-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🗂️ 2. Local vs Remote State
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🗂️ 2. Local vs Remote State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote State
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-using-azure-for-remote-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ☁️ 3. Using Azure for Remote State
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="☁️ 3. Using Azure for Remote State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-creating-the-backend-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Creating the backend resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-configure-the-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Configure the backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-state-locking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. State Locking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-security-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Security &amp; Best Practices
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-important-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Important Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Drift
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-real-world-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Real-World Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#terraform-backend-azurerm-resource_group_name-tfstate-rg-storage_account_name-tfstateaccount01-container_name-tfstate-key-labswebserverterraformtfstate-provider-azurerm-features-resource-azurerm_resource_group-main-name-example-rg-location-uksouth-resource-azurerm_virtual_network-main-name-example-vnet-address_space-1000016-location-azurerm_resource_groupmainlocation-resource_group_name-azurerm_resource_groupmainname-resource-azurerm_subnet-main-name-example-subnet-resource_group_name-azurerm_resource_groupmainname-virtual_network_name-azurerm_virtual_networkmainname-address_prefixes-1001024-resource-azurerm_network_interface-main-name-example-nic-location-azurerm_resource_groupmainlocation-resource_group_name-azurerm_resource_groupmainname-ip_configuration-name-internal-subnet_id-azurerm_subnetmainid-private_ip_address_allocation-dynamic-resource-azurerm_linux_virtual_machine-web-name-example-webserver-resource_group_name-azurerm_resource_groupmainname-location-azurerm_resource_groupmainlocation-size-standard_b1s-admin_username-azureuser-network_interface_ids-azurerm_network_interfacemainid-admin_ssh_key-username-azureuser-public_key-filesshid_rsapub-source_image_reference-publisher-canonical-offer-0001-com-ubuntu-server-focal-sku-20_04-lts-version-latest-output-web_ip-value-azurerm_linux_virtual_machinewebpublic_ip_address" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform { backend &quot;azurerm&quot; { resource_group_name = &quot;tfstate-rg&quot; storage_account_name = &quot;tfstateaccount01&quot; container_name = &quot;tfstate&quot; key = &quot;labs/webserver/terraform.tfstate&quot; } } provider &quot;azurerm&quot; { features {} } resource &quot;azurerm_resource_group&quot; &quot;main&quot; { name = &quot;example-rg&quot; location = &quot;uksouth&quot; } resource &quot;azurerm_virtual_network&quot; &quot;main&quot; { name = &quot;example-vnet&quot; address_space = [&quot;10.0.0.0/16&quot;] location = azurerm_resource_group.main.location resource_group_name = azurerm_resource_group.main.name } resource &quot;azurerm_subnet&quot; &quot;main&quot; { name = &quot;example-subnet&quot; resource_group_name = azurerm_resource_group.main.name virtual_network_name = azurerm_virtual_network.main.name address_prefixes = [&quot;10.0.1.0/24&quot;] } resource &quot;azurerm_network_interface&quot; &quot;main&quot; { name = &quot;example-nic&quot; location = azurerm_resource_group.main.location resource_group_name = azurerm_resource_group.main.name ip_configuration { name = &quot;internal&quot; subnet_id = azurerm_subnet.main.id private_ip_address_allocation = &quot;Dynamic&quot; } } resource &quot;azurerm_linux_virtual_machine&quot; &quot;web&quot; { name = &quot;example-webserver&quot; resource_group_name = azurerm_resource_group.main.name location = azurerm_resource_group.main.location size = &quot;Standard_B1s&quot; admin_username = &quot;azureuser&quot; network_interface_ids = [ azurerm_network_interface.main.id ] admin_ssh_key { username = &quot;azureuser&quot; public_key = file(&quot;~/.ssh/id_rsa.pub&quot;) } source_image_reference { publisher = &quot;Canonical&quot; offer = &quot;0001-com-ubuntu-server-focal&quot; sku = &quot;20_04-lts&quot; version = &quot;latest&quot; } } output &quot;web_ip&quot; { value = azurerm_linux_virtual_machine.web.public_ip_address }
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-practice-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Practice Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Practice Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#question-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 3
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-lab-challenge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Lab Challenge
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-advanced-terraform-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced Terraform Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 Providers and Registry
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 Providers and Registry
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-Providers-and-Registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Providers and the Terraform Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-Providers-and-Registry/01-provider-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Provider Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 Terraform Cloud and Enterprise
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    07 Terraform Cloud and Enterprise
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-Terraform-Cloud-and-Enterprise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terraform Cloud and Enterprise
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-Terraform-Cloud-and-Enterprise/01-terraform-cloud-enterprise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HCP Terraform (formerly Terraform Cloud) and Enterprise
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 Security and Best Practices
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    08 Security and Best Practices
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-Security-and-Best-Practices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security and Terraform Best Practices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-Security-and-Best-Practices/01-secrets-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Secrets Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#learning-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning Objectives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-terraform-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧩 1. What Is Terraform State?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🧩 1. What Is Terraform State?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#you-must-be-able-to-say-this-cleanly-in-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        You must be able to say this cleanly in interviews
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-local-vs-remote-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🗂️ 2. Local vs Remote State
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🗂️ 2. Local vs Remote State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote State
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-using-azure-for-remote-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ☁️ 3. Using Azure for Remote State
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="☁️ 3. Using Azure for Remote State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-creating-the-backend-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Creating the backend resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-configure-the-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Configure the backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-state-locking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. State Locking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-security-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Security &amp; Best Practices
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-important-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Important Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Drift
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-real-world-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Real-World Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#terraform-backend-azurerm-resource_group_name-tfstate-rg-storage_account_name-tfstateaccount01-container_name-tfstate-key-labswebserverterraformtfstate-provider-azurerm-features-resource-azurerm_resource_group-main-name-example-rg-location-uksouth-resource-azurerm_virtual_network-main-name-example-vnet-address_space-1000016-location-azurerm_resource_groupmainlocation-resource_group_name-azurerm_resource_groupmainname-resource-azurerm_subnet-main-name-example-subnet-resource_group_name-azurerm_resource_groupmainname-virtual_network_name-azurerm_virtual_networkmainname-address_prefixes-1001024-resource-azurerm_network_interface-main-name-example-nic-location-azurerm_resource_groupmainlocation-resource_group_name-azurerm_resource_groupmainname-ip_configuration-name-internal-subnet_id-azurerm_subnetmainid-private_ip_address_allocation-dynamic-resource-azurerm_linux_virtual_machine-web-name-example-webserver-resource_group_name-azurerm_resource_groupmainname-location-azurerm_resource_groupmainlocation-size-standard_b1s-admin_username-azureuser-network_interface_ids-azurerm_network_interfacemainid-admin_ssh_key-username-azureuser-public_key-filesshid_rsapub-source_image_reference-publisher-canonical-offer-0001-com-ubuntu-server-focal-sku-20_04-lts-version-latest-output-web_ip-value-azurerm_linux_virtual_machinewebpublic_ip_address" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform { backend &quot;azurerm&quot; { resource_group_name = &quot;tfstate-rg&quot; storage_account_name = &quot;tfstateaccount01&quot; container_name = &quot;tfstate&quot; key = &quot;labs/webserver/terraform.tfstate&quot; } } provider &quot;azurerm&quot; { features {} } resource &quot;azurerm_resource_group&quot; &quot;main&quot; { name = &quot;example-rg&quot; location = &quot;uksouth&quot; } resource &quot;azurerm_virtual_network&quot; &quot;main&quot; { name = &quot;example-vnet&quot; address_space = [&quot;10.0.0.0/16&quot;] location = azurerm_resource_group.main.location resource_group_name = azurerm_resource_group.main.name } resource &quot;azurerm_subnet&quot; &quot;main&quot; { name = &quot;example-subnet&quot; resource_group_name = azurerm_resource_group.main.name virtual_network_name = azurerm_virtual_network.main.name address_prefixes = [&quot;10.0.1.0/24&quot;] } resource &quot;azurerm_network_interface&quot; &quot;main&quot; { name = &quot;example-nic&quot; location = azurerm_resource_group.main.location resource_group_name = azurerm_resource_group.main.name ip_configuration { name = &quot;internal&quot; subnet_id = azurerm_subnet.main.id private_ip_address_allocation = &quot;Dynamic&quot; } } resource &quot;azurerm_linux_virtual_machine&quot; &quot;web&quot; { name = &quot;example-webserver&quot; resource_group_name = azurerm_resource_group.main.name location = azurerm_resource_group.main.location size = &quot;Standard_B1s&quot; admin_username = &quot;azureuser&quot; network_interface_ids = [ azurerm_network_interface.main.id ] admin_ssh_key { username = &quot;azureuser&quot; public_key = file(&quot;~/.ssh/id_rsa.pub&quot;) } source_image_reference { publisher = &quot;Canonical&quot; offer = &quot;0001-com-ubuntu-server-focal&quot; sku = &quot;20_04-lts&quot; version = &quot;latest&quot; } } output &quot;web_ip&quot; { value = azurerm_linux_virtual_machine.web.public_ip_address }
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-practice-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Practice Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Practice Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#question-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 3
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-lab-challenge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Lab Challenge
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="state-management">State Management</h1>
+<h2 id="learning-objectives">Learning Objectives</h2>
+<ul>
+<li>Understand what Terraform state is and why it’s critical.</li>
+<li>Learn how to configure <strong>remote state</strong> storage using Blob Storage in Azure</li>
+<li>Explore best practices for securing and managing state files.</li>
+<li>Understand <strong>state locking</strong>, <strong>migration</strong>, and <strong>drift detection</strong>.</li>
+</ul>
+<hr />
+<h2 id="1-what-is-terraform-state">🧩 1. What Is Terraform State?</h2>
+<p>Terraform is declarative — it describes <em>desired infrastructure</em>.<br />
+To track what’s already deployed, it maintains a <strong>state file</strong> (<code>terraform.tfstate</code>).</p>
+<p>The state file:
+- Maps Terraform resources → real-world infrastructure (IDs, ARNs, IPs)
+- Stores attributes, dependencies, and metadata
+- Enables drift detection during <code>terraform plan</code></p>
+<p>Without it, Terraform wouldn’t know what exists and could recreate resources unnecessarily.</p>
+<p><strong>Analogy:</strong><br />
+Terraform state = Terraform’s “memory” or “etcd” (like Kubernetes).<br />
+Lose it, and Terraform forgets your infrastructure.</p>
+<h3 id="you-must-be-able-to-say-this-cleanly-in-interviews">You must be able to say this cleanly in interviews</h3>
+<p>“Terraform state maps real infrastructure to the configuration by storing IDs, attributes, and metadata Terraform needs to plan updates.”</p>
+<p>“Terraform uses state to determine the difference between desired config and real infrastructure.”</p>
+<hr />
+<h2 id="2-local-vs-remote-state">🗂️ 2. Local vs Remote State</h2>
+<h3 id="local-state">Local State</h3>
+<ul>
+<li>Default behavior (file saved in your working directory)</li>
+<li>Fine for single-user testing</li>
+<li>Risks: lost state, drift, no collaboration, secrets exposure</li>
+</ul>
+<h3 id="remote-state">Remote State</h3>
+<ul>
+<li>Stored in a shared backend (Azure Blob Storage, Terraform Cloud, etc.)</li>
+<li>Enables team collaboration</li>
+<li>Secures access, adds locking, and provides durability</li>
+</ul>
+<hr />
+<h2 id="3-using-azure-for-remote-state">☁️ 3. Using Azure for Remote State</h2>
+<h3 id="step-1-creating-the-backend-resources">Step 1: Creating the backend resources</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>az<span class="w"> </span>group<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>tfstate-rg<span class="w"> </span>-l<span class="w"> </span>uksouth
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>az<span class="w"> </span>storage<span class="w"> </span>account<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>tfstateaccount01<span class="w"> </span>-g<span class="w"> </span>tfstate-rg<span class="w"> </span>-l<span class="w"> </span>uksouth<span class="w"> </span>--sku<span class="w"> </span>Standard_LRS
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>az<span class="w"> </span>storage<span class="w"> </span>container<span class="w"> </span>create<span class="w"> </span>--account-name<span class="w"> </span>tfstateaccount01<span class="w"> </span>-n<span class="w"> </span>tfstate
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1">## Azure automatically encrypts data at rest</span>
+</code></pre></div>
+<h3 id="step-2-configure-the-backend">Step 2: Configure the backend</h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>terraform<span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>backend<span class="w"> </span><span class="s2">&quot;azurerm&quot;</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nv">resource_group_name</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;tfstate-rg&quot;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nv">storage_account_name</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;tfstateaccount01&quot;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nv">container_name</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;tfstate&quot;</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="nv">key</span><span class="w">                   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;dev/network/terraform.tfstate&quot;</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="o">}</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="o">}</span>
+</code></pre></div>
+Then run: 
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>terraform init
+</code></pre></div>
+Terraform will ask to migrate local state → remote backend.</p>
+<hr />
+<h2 id="4-state-locking">4. State Locking</h2>
+<p>To prevent two people running terraform apply simultaneously:</p>
+<ul>
+<li>Azure uses Blob Leases for locking.</li>
+<li>When Terraform runs, it acquires a lease on the .tfstate blob.</li>
+<li>If locked, you’ll see:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Error acquiring state lock
+</code></pre></div>
+<p>To unlock:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>terraform force-unlock &lt;lock-id&gt;
+</code></pre></div>
+Used carefully — only when you KNOW no process is running.</p>
+<hr />
+<h2 id="5-security-best-practices">5. Security &amp; Best Practices</h2>
+<table>
+<thead>
+<tr>
+<th>Practice</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Restrict  access</td>
+<td>Only admins/CI should access the blob container</td>
+</tr>
+<tr>
+<td>Enable Storage Account versioning</td>
+<td>Recover corrupted or deleted state</td>
+</tr>
+<tr>
+<td>Use <code>prevent_destroy</code> lifecycle rule</td>
+<td>Avoid accidental destruction of critical infra</td>
+</tr>
+<tr>
+<td>Never commit <code>.tfstate</code> files</td>
+<td>They may contain secrets</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-important-commands">6. Important Commands</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>terraform state list</code></td>
+<td>Lists all resources tracked in state</td>
+</tr>
+<tr>
+<td><code>terraform state show &lt;addr&gt;</code></td>
+<td>Shows attributes of a specific resource</td>
+</tr>
+<tr>
+<td><code>terraform state mv &lt;old&gt; &lt;new&gt;</code></td>
+<td>Moves or renames resources inside state</td>
+</tr>
+<tr>
+<td><code>terraform state rm &lt;addr&gt;</code></td>
+<td>Removes a resource from state without deleting it</td>
+</tr>
+<tr>
+<td><code>terraform state pull</code></td>
+<td>Retrieves current state (useful for debugging)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-drift">7. Drift</h2>
+<p>Drift happens when the cloud changes WITHOUT Terraform knowing.</p>
+<p>Examples of drift:
+- Someone added tags in Azure Portal
+- A resource was deleted manually
+- A security group rule changed
+- A load balancer got a new listener</p>
+<p>Terraform detects drift during:
+- terraform plan
+- terraform apply
+- terraform plan -refresh-only</p>
+<p>Note: “Terraform will NOT fix drift automatically. It will show it in the plan.”
+And if something is deleted manually? Terraform sees: “Expected → found none → MUST be recreated.”</p>
+<hr />
+<h2 id="8-real-world-example">8. Real-World Example</h2>
+<h2 id="terraform-backend-azurerm-resource_group_name-tfstate-rg-storage_account_name-tfstateaccount01-container_name-tfstate-key-labswebserverterraformtfstate-provider-azurerm-features-resource-azurerm_resource_group-main-name-example-rg-location-uksouth-resource-azurerm_virtual_network-main-name-example-vnet-address_space-1000016-location-azurerm_resource_groupmainlocation-resource_group_name-azurerm_resource_groupmainname-resource-azurerm_subnet-main-name-example-subnet-resource_group_name-azurerm_resource_groupmainname-virtual_network_name-azurerm_virtual_networkmainname-address_prefixes-1001024-resource-azurerm_network_interface-main-name-example-nic-location-azurerm_resource_groupmainlocation-resource_group_name-azurerm_resource_groupmainname-ip_configuration-name-internal-subnet_id-azurerm_subnetmainid-private_ip_address_allocation-dynamic-resource-azurerm_linux_virtual_machine-web-name-example-webserver-resource_group_name-azurerm_resource_groupmainname-location-azurerm_resource_groupmainlocation-size-standard_b1s-admin_username-azureuser-network_interface_ids-azurerm_network_interfacemainid-admin_ssh_key-username-azureuser-public_key-filesshid_rsapub-source_image_reference-publisher-canonical-offer-0001-com-ubuntu-server-focal-sku-20_04-lts-version-latest-output-web_ip-value-azurerm_linux_virtual_machinewebpublic_ip_address"><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>terraform {
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>  backend &quot;azurerm&quot; {
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    resource_group_name   = &quot;tfstate-rg&quot;
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    storage_account_name  = &quot;tfstateaccount01&quot;
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    container_name        = &quot;tfstate&quot;
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    key                   = &quot;labs/webserver/terraform.tfstate&quot;
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>  }
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>}
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>provider &quot;azurerm&quot; {
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>  features {}
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>}
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>resource &quot;azurerm_resource_group&quot; &quot;main&quot; {
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>  name     = &quot;example-rg&quot;
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>  location = &quot;uksouth&quot;
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>}
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>resource &quot;azurerm_virtual_network&quot; &quot;main&quot; {
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>  name                = &quot;example-vnet&quot;
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>  address_space       = [&quot;10.0.0.0/16&quot;]
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>  location            = azurerm_resource_group.main.location
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>  resource_group_name = azurerm_resource_group.main.name
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>}
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>
+<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>resource &quot;azurerm_subnet&quot; &quot;main&quot; {
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>  name                 = &quot;example-subnet&quot;
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>  resource_group_name  = azurerm_resource_group.main.name
+<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>  virtual_network_name = azurerm_virtual_network.main.name
+<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a>  address_prefixes     = [&quot;10.0.1.0/24&quot;]
+<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a>}
+<a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a>
+<a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a>resource &quot;azurerm_network_interface&quot; &quot;main&quot; {
+<a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a>  name                = &quot;example-nic&quot;
+<a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a>  location            = azurerm_resource_group.main.location
+<a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>  resource_group_name = azurerm_resource_group.main.name
+<a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a>
+<a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a>  ip_configuration {
+<a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a>    name                          = &quot;internal&quot;
+<a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a>    subnet_id                     = azurerm_subnet.main.id
+<a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a>    private_ip_address_allocation = &quot;Dynamic&quot;
+<a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a>  }
+<a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a>}
+<a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a>
+<a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a>resource &quot;azurerm_linux_virtual_machine&quot; &quot;web&quot; {
+<a id="__codelineno-5-48" name="__codelineno-5-48" href="#__codelineno-5-48"></a>  name                = &quot;example-webserver&quot;
+<a id="__codelineno-5-49" name="__codelineno-5-49" href="#__codelineno-5-49"></a>  resource_group_name = azurerm_resource_group.main.name
+<a id="__codelineno-5-50" name="__codelineno-5-50" href="#__codelineno-5-50"></a>  location            = azurerm_resource_group.main.location
+<a id="__codelineno-5-51" name="__codelineno-5-51" href="#__codelineno-5-51"></a>  size                = &quot;Standard_B1s&quot;
+<a id="__codelineno-5-52" name="__codelineno-5-52" href="#__codelineno-5-52"></a>  admin_username      = &quot;azureuser&quot;
+<a id="__codelineno-5-53" name="__codelineno-5-53" href="#__codelineno-5-53"></a>
+<a id="__codelineno-5-54" name="__codelineno-5-54" href="#__codelineno-5-54"></a>  network_interface_ids = [
+<a id="__codelineno-5-55" name="__codelineno-5-55" href="#__codelineno-5-55"></a>    azurerm_network_interface.main.id
+<a id="__codelineno-5-56" name="__codelineno-5-56" href="#__codelineno-5-56"></a>  ]
+<a id="__codelineno-5-57" name="__codelineno-5-57" href="#__codelineno-5-57"></a>
+<a id="__codelineno-5-58" name="__codelineno-5-58" href="#__codelineno-5-58"></a>  admin_ssh_key {
+<a id="__codelineno-5-59" name="__codelineno-5-59" href="#__codelineno-5-59"></a>    username   = &quot;azureuser&quot;
+<a id="__codelineno-5-60" name="__codelineno-5-60" href="#__codelineno-5-60"></a>    public_key = file(&quot;~/.ssh/id_rsa.pub&quot;)
+<a id="__codelineno-5-61" name="__codelineno-5-61" href="#__codelineno-5-61"></a>  }
+<a id="__codelineno-5-62" name="__codelineno-5-62" href="#__codelineno-5-62"></a>
+<a id="__codelineno-5-63" name="__codelineno-5-63" href="#__codelineno-5-63"></a>  source_image_reference {
+<a id="__codelineno-5-64" name="__codelineno-5-64" href="#__codelineno-5-64"></a>    publisher = &quot;Canonical&quot;
+<a id="__codelineno-5-65" name="__codelineno-5-65" href="#__codelineno-5-65"></a>    offer     = &quot;0001-com-ubuntu-server-focal&quot;
+<a id="__codelineno-5-66" name="__codelineno-5-66" href="#__codelineno-5-66"></a>    sku       = &quot;20_04-lts&quot;
+<a id="__codelineno-5-67" name="__codelineno-5-67" href="#__codelineno-5-67"></a>    version   = &quot;latest&quot;
+<a id="__codelineno-5-68" name="__codelineno-5-68" href="#__codelineno-5-68"></a>  }
+<a id="__codelineno-5-69" name="__codelineno-5-69" href="#__codelineno-5-69"></a>}
+<a id="__codelineno-5-70" name="__codelineno-5-70" href="#__codelineno-5-70"></a>
+<a id="__codelineno-5-71" name="__codelineno-5-71" href="#__codelineno-5-71"></a>output &quot;web_ip&quot; {
+<a id="__codelineno-5-72" name="__codelineno-5-72" href="#__codelineno-5-72"></a>  value = azurerm_linux_virtual_machine.web.public_ip_address
+<a id="__codelineno-5-73" name="__codelineno-5-73" href="#__codelineno-5-73"></a>}
+</code></pre></div></h2>
+<h2 id="8-key-takeaways">8. Key Takeaways</h2>
+<ul>
+<li>State = Terraform’s source of truth for infrastructure.</li>
+<li>Storage account + container (locking built‑in via blob leases)</li>
+<li>Always secure state (encryption + RBAC).</li>
+<li>Never modify terraform.tfstate manually — use terraform state commands.</li>
+<li>Think of the state file as Terraform’s equivalent of etcd in Kubernetes.</li>
+</ul>
+<hr />
+<h2 id="9-practice-questions">9. Practice Questions</h2>
+<h3 id="question-1">Question 1</h3>
+<p>What is the primary purpose of Terraform state?
+A) Store Terraform configuration files
+B) Track the mapping between Terraform resources and real infrastructure
+C) Cache provider plugins
+D) Store variable values</p>
+<details>
+<summary>Show Answer</summary>
+Answer: **B** - Terraform state tracks the mapping between resources defined in code and actual infrastructure in the cloud, storing IDs, and attributes needed for management.
+</details>
+
+<hr />
+<h3 id="question-2">Question 2</h3>
+<p>What does Blob Leases provide in an Storage Account backend configuration?
+A) Stores the state file
+B) Provides state locking to prevent concurrent modifications
+C) Encrypts the state file
+D) Backs up the state file</p>
+<details>
+<summary>Show Answer</summary>
+Answer: **B** - Blob Leases provides state locking, preventing multiple users or processes from modifying state simultaneously, which prevents corruption.
+</details>
+
+<hr />
+<h3 id="question-3">Question 3</h3>
+<p>Which command should you use to move a resource from one address to another in state without recreating it?
+A) <code>terraform state rm</code>
+B) <code>terraform state mv</code>
+C) <code>terraform state push</code>
+D) <code>terraform state pull</code></p>
+<details>
+<summary>Show Answer</summary>
+Answer: **B** - `terraform state mv` renames or moves resources within state without affecting the actual infrastructure, useful when refactoring code.
+</details>
+
+<hr />
+<h2 id="10-lab-challenge">10. Lab Challenge</h2>
+<p>Create a remote state backend using:
+1. Storage Account Container (my-terraform-lab-state)
+2. Blob leases (terraform-lock-lab)
+3. A simple Virtual Machine
+4. Verify remote state exists by browsing to the container
+5. Try intentionally applying twice to test locking</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "navigation.expand"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

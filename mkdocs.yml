@@ -13,3 +13,6 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+
+docs_dir: content 
+site_dir: docs

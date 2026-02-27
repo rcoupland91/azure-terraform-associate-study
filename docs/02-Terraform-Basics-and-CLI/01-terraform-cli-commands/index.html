@@ -1,0 +1,2850 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../02-resource-targeting-and-import/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Terraform CLI Commands - My Code Library</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#terraform-cli-commands" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="My Code Library" class="md-header__button md-logo" aria-label="My Code Library" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            My Code Library
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Terraform CLI Commands
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="My Code Library" class="md-nav__button md-logo" aria-label="My Code Library" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    My Code Library
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    00 Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    00 Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../00-Getting-Started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started with Terraform Associate Prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../00-Getting-Started/01-intro-to-terraform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction to Terraform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../00-Getting-Started/02-automating-azure-deployments-with-terraform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automating Azure Deployments with Terraform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../00-Getting-Started/03-troubleshooting-and-debugging-terraform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting and Debugging Terraform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 Understand Infrastructure as Code
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 Understand Infrastructure as Code
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-Understand-Infrastructure-as-Code/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Understanding Infrastructure as Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 Terraform Basics and CLI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 Terraform Basics and CLI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terraform Basics and CLI Mastery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terraform CLI Commands
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terraform CLI Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#learning-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning Objectives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-core-workflow-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Core Workflow Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Core Workflow Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform init
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform plan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-apply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform apply
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-destroy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform destroy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-validation-and-formatting-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Validation and Formatting Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Validation and Formatting Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-fmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform fmt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-validate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform validate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform version
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-debugging-and-inspection-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Debugging and Inspection Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Debugging and Inspection Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-console" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform console
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform graph
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform output
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-state-management-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. State Management Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. State Management Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state list
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-show" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state show
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-mv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state mv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-rm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state rm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-pull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state pull
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-push" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state push
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-workspace-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Workspace Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Workspace Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-workspace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform workspace
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-lock-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Lock Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Lock Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-force-unlock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform force-unlock
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-command-comparison-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Command Comparison Table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-exam-style-practice-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Exam-Style Practice Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Exam-Style Practice Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#question-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 5
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-common-exam-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Common Exam Patterns
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-resource-targeting-and-import/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resource Targeting And Import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 Terraform Configuration Language
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 Terraform Configuration Language
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terraform Configuration Language
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/01-variables-and-outputs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables And Outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/02-for-each-vs-count/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    For Each Vs Count
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/03-lifecycle-blocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lifecycle Blocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/04-custom-validation-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 - Custom Validation Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-Terraform-Configuration-Language/05-ephemeral-values-write-only/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 - Ephemeral Values and Write-Only Arguments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 Modules and Dependency Management
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 Modules and Dependency Management
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-Modules-and-Dependency-Management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modules and Dependency Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-Modules-and-Dependency-Management/01-modules-and-backends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modules And Backends
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 State Backends and Workspaces
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 State Backends and Workspaces
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-State-Backends-and-Workspaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State, Backends, and Workspaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-State-Backends-and-Workspaces/01-state-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-State-Backends-and-Workspaces/02-advanced-terraform-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced Terraform Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 Providers and Registry
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 Providers and Registry
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-Providers-and-Registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Providers and the Terraform Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-Providers-and-Registry/01-provider-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Provider Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 Terraform Cloud and Enterprise
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    07 Terraform Cloud and Enterprise
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-Terraform-Cloud-and-Enterprise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terraform Cloud and Enterprise
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-Terraform-Cloud-and-Enterprise/01-terraform-cloud-enterprise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HCP Terraform (formerly Terraform Cloud) and Enterprise
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 Security and Best Practices
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    08 Security and Best Practices
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-Security-and-Best-Practices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security and Terraform Best Practices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-Security-and-Best-Practices/01-secrets-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Secrets Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#learning-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning Objectives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-core-workflow-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Core Workflow Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Core Workflow Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform init
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform plan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-apply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform apply
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-destroy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform destroy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-validation-and-formatting-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Validation and Formatting Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Validation and Formatting Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-fmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform fmt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-validate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform validate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform version
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-debugging-and-inspection-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Debugging and Inspection Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Debugging and Inspection Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-console" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform console
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform graph
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform output
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-state-management-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. State Management Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. State Management Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state list
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-show" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state show
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-mv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state mv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-rm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state rm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-pull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state pull
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform-state-push" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform state push
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-workspace-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Workspace Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Workspace Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-workspace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform workspace
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-lock-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Lock Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Lock Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform-force-unlock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        terraform force-unlock
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-command-comparison-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Command Comparison Table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-exam-style-practice-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Exam-Style Practice Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Exam-Style Practice Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#question-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Question 5
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-common-exam-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Common Exam Patterns
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="terraform-cli-commands">Terraform CLI Commands</h1>
+<h2 id="learning-objectives">Learning Objectives</h2>
+<ul>
+<li>Master essential Terraform CLI commands for the exam.</li>
+<li>Understand when to use each command and common flags.</li>
+<li>Learn the difference between similar commands (<code>plan</code> vs <code>plan -refresh-only</code>).</li>
+<li>Practice commands that are frequently tested.</li>
+</ul>
+<hr />
+<h2 id="1-core-workflow-commands">1. Core Workflow Commands</h2>
+<h3 id="terraform-init"><code>terraform init</code></h3>
+<p><strong>Purpose:</strong> Initializes a Terraform working directory.</p>
+<p><strong>What it does:</strong>
+- Downloads provider plugins
+- Initializes backend configuration
+- Installs modules (if any)
+- Sets up <code>.terraform</code> directory</p>
+<p><strong>Common flags:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>terraform<span class="w"> </span>init<span class="w">                    </span><span class="c1"># Standard initialization</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>terraform<span class="w"> </span>init<span class="w"> </span>-upgrade<span class="w">           </span><span class="c1"># Upgrade provider versions</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>terraform<span class="w"> </span>init<span class="w"> </span>-reconfigure<span class="w">      </span><span class="c1"># Reconfigure backend without migration</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>terraform<span class="w"> </span>init<span class="w"> </span>-migrate-state<span class="w">    </span><span class="c1"># Migrate state to new backend</span>
+</code></pre></div></p>
+<p><strong>Exam tip:</strong> <code>init</code> must be run before <code>plan</code> or <code>apply</code>. If you see an error about missing providers, run <code>terraform init</code>.</p>
+<hr />
+<h3 id="terraform-plan"><code>terraform plan</code></h3>
+<p><strong>Purpose:</strong> Creates an execution plan showing what Terraform will do.</p>
+<p><strong>What it shows:</strong>
+- Resources to be created (+)
+- Resources to be updated (~)
+- Resources to be destroyed (-)</p>
+<p><strong>Common flags:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>terraform<span class="w"> </span>plan<span class="w">                                    </span><span class="c1"># Standard plan</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>terraform<span class="w"> </span>plan<span class="w"> </span>-out<span class="o">=</span>tfplan<span class="w">                        </span><span class="c1"># Save plan to file</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>terraform<span class="w"> </span>plan<span class="w"> </span>-var<span class="o">=</span><span class="s2">&quot;location=uksouth&quot;</span><span class="w">            </span><span class="c1"># Set variable</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>terraform<span class="w"> </span>plan<span class="w"> </span>-var-file<span class="o">=</span>prod.tfvars<span class="w">              </span><span class="c1"># Use variable file</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>terraform<span class="w"> </span>plan<span class="w"> </span>-target<span class="o">=</span>azure_vm.web<span class="w">               </span><span class="c1"># Plan specific resource only</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>terraform<span class="w"> </span>plan<span class="w"> </span>-refresh<span class="o">=</span><span class="nb">false</span><span class="w">                     </span><span class="c1"># Skip state refresh</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>terraform<span class="w"> </span>plan<span class="w"> </span>-refresh-only<span class="w">                      </span><span class="c1"># Only refresh state, don&#39;t plan changes</span>
+</code></pre></div></p>
+<p><strong>Key differences:</strong>
+- <code>plan -refresh=false</code>: Use cached state, faster but may miss drift
+- <code>plan -refresh-only</code>: Only update state from real infrastructure, don't plan changes</p>
+<p><strong>Exam tip:</strong> <code>terraform plan -out=tfplan</code> saves the plan, then <code>terraform apply tfplan</code> applies it exactly as planned.</p>
+<hr />
+<h3 id="terraform-apply"><code>terraform apply</code></h3>
+<p><strong>Purpose:</strong> Applies the changes required to reach the desired state.</p>
+<p><strong>Common flags:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>terraform<span class="w"> </span>apply<span class="w">                             </span><span class="c1"># Interactive (prompts for approval)</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>terraform<span class="w"> </span>apply<span class="w"> </span>-auto-approve<span class="w">               </span><span class="c1"># Skip confirmation prompt</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>terraform<span class="w"> </span>apply<span class="w"> </span>tfplan<span class="w">                      </span><span class="c1"># Apply saved plan file</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>terraform<span class="w"> </span>apply<span class="w"> </span>-target<span class="o">=</span>azure_vm.web<span class="w">        </span><span class="c1"># Apply to specific resource</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>terraform<span class="w"> </span>apply<span class="w"> </span>-refresh<span class="o">=</span><span class="nb">false</span><span class="w">              </span><span class="c1"># Use cached state</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>terraform<span class="w"> </span>apply<span class="w"> </span>-var<span class="o">=</span><span class="s2">&quot;key=value&quot;</span><span class="w">            </span><span class="c1"># Pass variable</span>
+</code></pre></div></p>
+<p><strong>Exam tip:</strong> <code>terraform apply -auto-approve</code> is useful in CI/CD pipelines.</p>
+<hr />
+<h3 id="terraform-destroy"><code>terraform destroy</code></h3>
+<p><strong>Purpose:</strong> Destroys all resources managed by Terraform.</p>
+<p><strong>Common flags:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>terraform<span class="w"> </span>destroy<span class="w">                          </span><span class="c1"># Interactive destruction</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>terraform<span class="w"> </span>destroy<span class="w"> </span>-auto-approve<span class="w">            </span><span class="c1"># Skip confirmation</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>terraform<span class="w"> </span>destroy<span class="w"> </span>-target<span class="o">=</span>azure_vm.web<span class="w">     </span><span class="c1"># Destroy specific resource</span>
+</code></pre></div></p>
+<hr />
+<h2 id="2-validation-and-formatting-commands">2. Validation and Formatting Commands</h2>
+<h3 id="terraform-fmt"><code>terraform fmt</code></h3>
+<p><strong>Purpose:</strong> Rewrites Terraform configuration files to a canonical format and style.</p>
+<p><strong>What it does:</strong>
+- Formats <code>.tf</code> files
+- Ensures consistent indentation
+- Standardizes spacing
+- Can format <code>.tfvars</code> files too</p>
+<p><strong>Common flags:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>terraform<span class="w"> </span>fmt<span class="w">              </span><span class="c1"># Format files in current directory</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>terraform<span class="w"> </span>fmt<span class="w"> </span>-write<span class="w">       </span><span class="c1"># Write formatted files (default behavior)</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>terraform<span class="w"> </span>fmt<span class="w"> </span>-check<span class="w">       </span><span class="c1"># Check if files need formatting (CI/CD)</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>terraform<span class="w"> </span>fmt<span class="w"> </span>-recursive<span class="w">   </span><span class="c1"># Format all subdirectories</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>terraform<span class="w"> </span>fmt<span class="w"> </span>-diff<span class="w">        </span><span class="c1"># Show what would change</span>
+</code></pre></div></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Before formatting (inconsistent spacing)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>resource<span class="w"> </span><span class="s2">&quot;azurerm_key_vault&quot;</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nv">name</span><span class="w">                        </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;examplekeyvault&quot;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nv">location</span><span class="w">                    </span><span class="o">=</span><span class="w"> </span>var.location
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nv">resource_group_name</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;testresourcegroup&quot;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nv">tenant_id</span><span class="w">                   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;29334838934093843894328&quot;</span><span class="w"> </span><span class="c1">#test tenant ID</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="o">}</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="c1"># After terraform fmt</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>resource<span class="w"> </span><span class="s2">&quot;azurerm_key_vault&quot;</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="nv">name</span><span class="w">                        </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;examplekeyvault&quot;</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="nv">location</span><span class="w">                    </span><span class="o">=</span><span class="w"> </span>var.location
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">  </span><span class="nv">resource_group_name</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;testresourcegroup&quot;</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="nv">tenant_id</span><span class="w">                   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;29334838934093843894328&quot;</span><span class="w"> </span><span class="c1">#test tenant ID</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="o">}</span>
+</code></pre></div></p>
+<p><strong>Exam tip:</strong> <code>terraform fmt</code> is idempotent — running it multiple times produces the same result.</p>
+<hr />
+<h3 id="terraform-validate"><code>terraform validate</code></h3>
+<p><strong>Purpose:</strong> Validates the Terraform configuration files in a directory.</p>
+<p><strong>What it checks:</strong>
+- Syntax errors
+- Type mismatches
+- Reference errors
+- Provider configuration issues</p>
+<p><strong>Note:</strong> Does NOT check if resources exist in the cloud or if your credentials are valid.</p>
+<p><strong>Common flags:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>terraform<span class="w"> </span>validate<span class="w">           </span><span class="c1"># Validate configuration</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>terraform<span class="w"> </span>validate<span class="w"> </span>-json<span class="w">     </span><span class="c1"># Output in JSON format</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>terraform<span class="w"> </span>validate<span class="w"> </span>-no-color<span class="w"> </span><span class="c1"># Disable color output</span>
+</code></pre></div></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>terraform<span class="w"> </span>validate
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># Success! The configuration is valid.</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Or if there&#39;s an error:</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>Error:<span class="w"> </span>Reference<span class="w"> </span>to<span class="w"> </span>undeclared<span class="w"> </span>input<span class="w"> </span>variable
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span>on<span class="w"> </span>main.tf<span class="w"> </span>line<span class="w"> </span><span class="m">5</span>:
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">   </span><span class="m">5</span>:<span class="w"> </span><span class="nv">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>var.invalid_var
+</code></pre></div></p>
+<p><strong>Exam tip:</strong> Always run <code>terraform validate</code> before committing code. It's faster than <code>plan</code> and catches config errors early.</p>
+<hr />
+<h3 id="terraform-version"><code>terraform version</code></h3>
+<p><strong>Purpose:</strong> Displays the version of Terraform and installed providers.</p>
+<p><strong>Output shows:</strong>
+- Terraform version
+- Provider versions
+- Terraform required version (if specified)</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>terraform<span class="w"> </span>version
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Terraform<span class="w"> </span>v1.12.0
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>on<span class="w"> </span>windows_amd64
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>+<span class="w"> </span>provider<span class="w"> </span>registry.terraform.io/hashicorp/azuread<span class="w"> </span>v3.8.0
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>+<span class="w"> </span>provider<span class="w"> </span>registry.terraform.io/hashicorp/azurerm<span class="w"> </span>v4.21.1
+</code></pre></div></p>
+<p><strong>Common flags:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>terraform<span class="w"> </span>version<span class="w">         </span><span class="c1"># Show version</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>terraform<span class="w"> </span>version<span class="w"> </span>-json<span class="w">  </span><span class="c1"># JSON output</span>
+</code></pre></div></p>
+<hr />
+<h2 id="3-debugging-and-inspection-commands">3. Debugging and Inspection Commands</h2>
+<h3 id="terraform-console"><code>terraform console</code></h3>
+<p><strong>Purpose:</strong> Interactive console for evaluating Terraform expressions.</p>
+<p><strong>Use cases:</strong>
+- Test functions
+- Evaluate expressions
+- Debug variable values
+- Experiment with syntax</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>$<span class="w"> </span>terraform<span class="w"> </span>console
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>&gt;<span class="w"> </span>var.aks_assigned_principle_identity
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nb">false</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>&gt;<span class="w"> </span>upper<span class="o">(</span><span class="s2">&quot;hello&quot;</span><span class="o">)</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>HELLO
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>&gt;<span class="w"> </span>length<span class="o">([</span><span class="s2">&quot;a&quot;</span>,<span class="w"> </span><span class="s2">&quot;b&quot;</span>,<span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="o">])</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="m">3</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>&gt;<span class="w"> </span>var.aks_assigned_principle_identity<span class="w"> </span>!<span class="o">=</span><span class="w"> </span>null<span class="w"> </span>?<span class="w"> </span>var.aks_assigned_principle_identity<span class="w"> </span>:<span class="w"> </span><span class="s2">&quot;true&quot;</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="nb">false</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>&gt;<span class="w"> </span><span class="nb">exit</span>
+</code></pre></div></p>
+<p><strong>Exam tip:</strong> Great for testing built-in functions and conditional expressions.</p>
+<hr />
+<h3 id="terraform-graph"><code>terraform graph</code></h3>
+<p><strong>Purpose:</strong> Creates a visual representation of resource dependencies.</p>
+<p><strong>Output:</strong>
+- Graph in DOT format (can be visualized with Graphviz)
+- Shows resource relationships
+- Useful for understanding dependencies</p>
+<p><strong>Common flags:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>terraform<span class="w"> </span>graph<span class="w">                    </span><span class="c1"># Output dependency graph</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>terraform<span class="w"> </span>graph<span class="w"> </span>&gt;<span class="w"> </span>graph.dot<span class="w">        </span><span class="c1"># Save to file</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>terraform<span class="w"> </span>graph<span class="w"> </span>-type<span class="o">=</span>plan<span class="w">         </span><span class="c1"># Plan-time graph</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>terraform<span class="w"> </span>graph<span class="w"> </span>-type<span class="o">=</span>apply<span class="w">        </span><span class="c1"># Apply-time graph (default)</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>terraform<span class="w"> </span>graph<span class="w"> </span>-type<span class="o">=</span>destroy<span class="w">      </span><span class="c1"># Destroy-time graph</span>
+</code></pre></div></p>
+<p><strong>Visualization:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>terraform<span class="w"> </span>graph<span class="w"> </span><span class="p">|</span><span class="w"> </span>dot<span class="w"> </span>-Tpng<span class="w"> </span>&gt;<span class="w"> </span>graph.png<span class="w">  </span><span class="c1"># Requires Graphviz installed</span>
+</code></pre></div></p>
+<hr />
+<h3 id="terraform-output"><code>terraform output</code></h3>
+<p><strong>Purpose:</strong> Reads and displays values from Terraform state.</p>
+<p><strong>Common flags:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>terraform<span class="w"> </span>output<span class="w">                    </span><span class="c1"># Show all outputs</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>terraform<span class="w"> </span>output<span class="w"> </span>instance_ip<span class="w">       </span><span class="c1"># Show specific output</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>terraform<span class="w"> </span>output<span class="w"> </span>-json<span class="w">              </span><span class="c1"># JSON format</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>terraform<span class="w"> </span>output<span class="w"> </span>-raw<span class="w"> </span>instance_ip<span class="w">   </span><span class="c1"># Raw value (no quotes)</span>
+</code></pre></div></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>$<span class="w"> </span>terraform<span class="w"> </span>output
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nv">instance_ip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;3.94.72.21&quot;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>$<span class="w"> </span>terraform<span class="w"> </span>output<span class="w"> </span>-raw<span class="w"> </span>instance_ip
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="m">3</span>.94.72.21
+</code></pre></div></p>
+<hr />
+<h2 id="4-state-management-commands">4. State Management Commands</h2>
+<h3 id="terraform-state-list"><code>terraform state list</code></h3>
+<p><strong>Purpose:</strong> Lists all resources in the Terraform state.</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>terraform<span class="w"> </span>state<span class="w"> </span>list
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>azurerm_role_assignment.storage_blob_data_owner
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>azurerm_service_plan.function_app
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>azurerm_storage_account.example
+</code></pre></div></p>
+<hr />
+<h3 id="terraform-state-show"><code>terraform state show</code></h3>
+<p><strong>Purpose:</strong> Shows detailed attributes of a specific resource in state.</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>terraform<span class="w"> </span>state<span class="w"> </span>show<span class="w"> </span><span class="s1">&#39;azurerm_resource_group.rg[\&quot;test\&quot;]&#39;</span><span class="w"> </span><span class="c1"># When using powershell and having multiple resources, you need to ensure quotations and backslashes are used as PowerShell will be interpreting the quotes and brackets, not Terraform itself.</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="c1"># azurerm_resource_group[&quot;test]:</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>resource<span class="w"> </span><span class="s2">&quot;azurerm_resource_group&quot;</span><span class="w"> </span><span class="s2">&quot;rg&quot;</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="nv">id</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/subscriptions/{subID}/resourceGroups/test-rg&quot;</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">    </span><span class="nv">location</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;uksouth&quot;</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">    </span><span class="nv">managed_by</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>null
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">    </span><span class="nv">name</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;test-rg&quot;</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">    </span><span class="nv">tags</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">        </span><span class="s2">&quot;Terraform&quot;</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;True&quot;</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">    </span><span class="o">}</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="o">}</span>
+</code></pre></div></p>
+<hr />
+<h3 id="terraform-state-mv"><code>terraform state mv</code></h3>
+<p><strong>Purpose:</strong> Moves or renames resources in state without recreating them.</p>
+<p><strong>Use cases:</strong>
+- Renaming resources
+- Moving resources to/from modules
+- Fixing state after code refactoring</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>terraform<span class="w"> </span>state<span class="w"> </span>mv<span class="w"> </span>azure_vm.old<span class="w"> </span>azure_vm.new
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>terraform<span class="w"> </span>state<span class="w"> </span>mv<span class="w"> </span>module.testapp_vm<span class="w"> </span>module.testapp_vm<span class="o">[</span><span class="m">0</span><span class="o">]</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>terraform<span class="w"> </span>state<span class="w"> </span>mv<span class="w"> </span>module.testapp_vm<span class="w"> </span>module.testapp_vm<span class="o">[</span><span class="s2">&quot;run&quot;</span><span class="o">]</span>
+</code></pre></div></p>
+<p><strong>Exam tip:</strong> This does NOT modify actual infrastructure, only the state file.</p>
+<hr />
+<h3 id="terraform-state-rm"><code>terraform state rm</code></h3>
+<p><strong>Purpose:</strong> Removes a resource from state WITHOUT destroying it in the cloud.</p>
+<p><strong>Use cases:</strong>
+- Resource managed outside Terraform
+- Moving resource to different Terraform config
+- Removing from state after manual deletion</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>terraform<span class="w"> </span>state<span class="w"> </span>rm<span class="w"> </span>azurerm_linux_virtual_machine.old
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>terraform<span class="w"> </span>state<span class="w"> </span>rm<span class="w"> </span>azurerm_app_service_plan.alert_function
+</code></pre></div></p>
+<p><strong>Warning:</strong> Resource still exists in Azure. Terraform will no longer manage it.</p>
+<hr />
+<h3 id="terraform-state-pull"><code>terraform state pull</code></h3>
+<p><strong>Purpose:</strong> Downloads and outputs the current state.</p>
+<p><strong>Use cases:</strong>
+- Backup state
+- Inspect raw state JSON
+- Debugging state issues</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>terraform<span class="w"> </span>state<span class="w"> </span>pull<span class="w"> </span>&gt;<span class="w"> </span>state-backup.json
+</code></pre></div></p>
+<hr />
+<h3 id="terraform-state-push"><code>terraform state push</code></h3>
+<p><strong>Purpose:</strong> Uploads a local state file to the backend.</p>
+<p><strong>Warning:</strong> Use with extreme caution. Can corrupt state if used incorrectly.</p>
+<p><strong>Common use case:</strong> Restoring from backup
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>terraform<span class="w"> </span>state<span class="w"> </span>push<span class="w"> </span>state-backup.json
+</code></pre></div></p>
+<hr />
+<h2 id="5-workspace-commands">5. Workspace Commands</h2>
+<h3 id="terraform-workspace"><code>terraform workspace</code></h3>
+<p><strong>Purpose:</strong> Manages Terraform workspaces.</p>
+<p><strong>Common commands:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>terraform<span class="w"> </span>workspace<span class="w"> </span>list<span class="w">          </span><span class="c1"># List all workspaces</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>terraform<span class="w"> </span>workspace<span class="w"> </span>show<span class="w">          </span><span class="c1"># Show current workspace</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>terraform<span class="w"> </span>workspace<span class="w"> </span>new<span class="w"> </span>dev<span class="w">       </span><span class="c1"># Create new workspace</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>terraform<span class="w"> </span>workspace<span class="w"> </span><span class="k">select</span><span class="w"> </span>dev<span class="w">    </span><span class="c1"># Switch workspace</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>terraform<span class="w"> </span>workspace<span class="w"> </span>delete<span class="w"> </span>dev<span class="w">   </span><span class="c1"># Delete workspace (must be empty)</span>
+</code></pre></div></p>
+<p><strong>Exam tip:</strong> Default workspace is called <code>default</code>.</p>
+<hr />
+<h2 id="6-lock-management">6. Lock Management</h2>
+<h3 id="terraform-force-unlock"><code>terraform force-unlock</code></h3>
+<p><strong>Purpose:</strong> Manually unlock the state.</p>
+<p><strong>Use when:</strong>
+- Lock stuck from crashed Terraform process
+- Another user's lock needs release
+- Manual intervention required</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>terraform<span class="w"> </span>force-unlock<span class="w"> </span>&lt;LOCK_ID&gt;
+</code></pre></div></p>
+<p><strong>Warning:</strong> Only use when you're certain no other Terraform operations are running.</p>
+<hr />
+<h2 id="7-command-comparison-table">7. Command Comparison Table</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+<th>Modifies State?</th>
+<th>Modifies Infrastructure?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>terraform init</code></td>
+<td>Initialize workspace</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>terraform plan</code></td>
+<td>Preview changes</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>terraform apply</code></td>
+<td>Apply changes</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>terraform destroy</code></td>
+<td>Destroy resources</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>terraform fmt</code></td>
+<td>Format code</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>terraform validate</code></td>
+<td>Check syntax</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>terraform state mv</code></td>
+<td>Move in state</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>terraform state rm</code></td>
+<td>Remove from state</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>terraform refresh</code></td>
+<td>Sync state</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-exam-style-practice-questions">8. Exam-Style Practice Questions</h2>
+<h3 id="question-1">Question 1</h3>
+<p>Which command validates Terraform configuration syntax without checking cloud resources?
+A) <code>terraform plan</code>
+B) <code>terraform validate</code>
+C) <code>terraform fmt</code>
+D) <code>terraform init</code></p>
+<details>
+<summary>Show Answer</summary>
+Answer: **B** - `terraform validate` checks syntax and configuration errors without connecting to providers.
+</details>
+
+<hr />
+<h3 id="question-2">Question 2</h3>
+<p>What is the difference between <code>terraform plan -refresh=false</code> and <code>terraform plan -refresh-only</code>?
+A) Both skip refreshing state
+B) <code>-refresh=false</code> skips refresh; <code>-refresh-only</code> only refreshes state
+C) Both only refresh state
+D) No difference</p>
+<details>
+<summary>Show Answer</summary>
+Answer: **B** - `-refresh=false` uses cached state for faster plans. `-refresh-only` updates state from real infrastructure but doesn't plan changes.
+</details>
+
+<hr />
+<h3 id="question-3">Question 3</h3>
+<p>Which command rewrites Terraform files to canonical format?
+A) <code>terraform format</code>
+B) <code>terraform fmt</code>
+C) <code>terraform validate</code>
+D) <code>terraform tidy</code></p>
+<details>
+<summary>Show Answer</summary>
+Answer: **B** - `terraform fmt` formats configuration files to a standard style.
+</details>
+
+<hr />
+<h3 id="question-4">Question 4</h3>
+<p>You want to rename a resource in state without recreating it. Which command should you use?
+A) <code>terraform state rm</code> then add new resource
+B) <code>terraform state mv</code>
+C) <code>terraform apply</code> with new name
+D) <code>terraform refresh</code></p>
+<details>
+<summary>Show Answer</summary>
+Answer: **B** - `terraform state mv` moves/renames resources in state without touching infrastructure.
+</details>
+
+<hr />
+<h3 id="question-5">Question 5</h3>
+<p>What does <code>terraform plan -out=tfplan</code> do?
+A) Saves plan to file for later application
+B) Outputs plan to console
+C) Applies the plan immediately
+D) Validates the configuration</p>
+<details>
+<summary>Show Answer</summary>
+Answer: **A** - Saves execution plan to a file. Use `terraform apply tfplan` to apply it later.
+</details>
+
+<hr />
+<h2 id="9-key-takeaways">9. Key Takeaways</h2>
+<ul>
+<li><strong><code>terraform init</code></strong>: Must run before plan/apply. Downloads providers and initializes backend.</li>
+<li><strong><code>terraform validate</code></strong>: Fast syntax/config check. Doesn't require providers.</li>
+<li><strong><code>terraform fmt</code></strong>: Formats code. Idempotent and safe to run multiple times.</li>
+<li><strong><code>terraform plan -refresh-only</code></strong>: Updates state from real infrastructure without planning changes.</li>
+<li><strong><code>terraform state mv</code></strong>: Renames resources in state without recreating them.</li>
+<li><strong><code>terraform state rm</code></strong>: Removes resource from state but keeps it in the cloud.</li>
+<li>Always use <code>terraform plan</code> before <code>apply</code> in production.</li>
+<li>Save plans with <code>-out</code> for reproducible applies.</li>
+</ul>
+<hr />
+<h2 id="10-common-exam-patterns">10. Common Exam Patterns</h2>
+<p><strong>Pattern 1: Which command for syntax validation?</strong>
+→ Always <code>terraform validate</code></p>
+<p><strong>Pattern 2: Formatting code</strong>
+→ Always <code>terraform fmt</code></p>
+<p><strong>Pattern 3: Moving/renaming resources</strong>
+→ Always <code>terraform state mv</code></p>
+<p><strong>Pattern 4: Fast state refresh without planning</strong>
+→ <code>terraform plan -refresh-only</code> or <code>terraform refresh</code></p>
+<p><strong>Pattern 5: Applying saved plan</strong>
+→ <code>terraform apply &lt;plan-file&gt;</code></p>
+<hr />
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://developer.hashicorp.com/terraform/cli/commands">Terraform CLI Commands</a></li>
+<li><a href="https://developer.hashicorp.com/terraform/cli/commands/state">Terraform State Commands</a></li>
+<li><a href="https://developer.hashicorp.com/terraform/cli/commands/plan">Terraform Plan Options</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "navigation.expand"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
