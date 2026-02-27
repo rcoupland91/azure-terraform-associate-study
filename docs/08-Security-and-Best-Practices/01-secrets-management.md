@@ -29,7 +29,7 @@ Terraform configurations often need sensitive data:
 ❌ **Don't do this:**
 ```hcl
 # BAD - Hardcoded secret
-resource "aws_db_instance" "main" {
+resource "azurerm_mssql_server" "main" {
   password = "MySecretPassword123!"
 }
 
@@ -79,7 +79,7 @@ terraform output
 connection_string = (sensitive value)
 
 # But still in state file!
-terraform state show aws_db_instance.main | grep password
+terraform state show azurerm_mssql_server.main | grep password
 password = "MySecretPassword123!"
 ```
 
@@ -94,7 +94,7 @@ password = "MySecretPassword123!"
 **Best for:** Simple secrets, single-user scenarios
 
 ```bash
-export TF_VAR_db_password="MySecretPassword123!"
+export TF_VAR_sql_password="MySecretPassword123!"
 terraform apply
 ```
 
@@ -133,25 +133,21 @@ secrets.tfvars
 - Need careful `.gitignore` management
 - Multiple files to manage
 
-### Method 3: AWS Secrets Manager Data Source
+### Method 3: Azure Key Vault Data Source
 
-**Best for:** AWS environments, rotating secrets
+**Best for:** Azure environments, rotating secrets
 
 ```hcl
-data "aws_secretsmanager_secret_version" "db_password" {
-  secret_id = "prod/database/password"
+data "azurerm_key_vault" "key_vault" {
+  name                = "key-vault-01"
+  resource_group_name = "mgmt-rg-01"
 }
 
-resource "aws_db_instance" "main" {
-  password = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["password"]
+data "azurerm_key_vault_secret" "server_password" {
+  name         = "admin-pw"
+  key_vault_id = data.azurerm_key_vault.key_vault.id
 }
-```
 
-**Setup in AWS:**
-```bash
-aws secretsmanager create-secret \
-  --name prod/database/password \
-  --secret-string '{"password":"MySecretPassword123!"}'
 ```
 
 **Pros:**
@@ -161,7 +157,7 @@ aws secretsmanager create-secret \
 - Encryption at rest
 
 **Cons:**
-- AWS-specific
+- Azure-specific
 - Requires Secrets Manager permissions
 - Cost per secret
 
@@ -188,7 +184,7 @@ data "vault_generic_secret" "db_password" {
   path = "secret/database/password"
 }
 
-resource "aws_db_instance" "main" {
+resource "azurerm_mssql_server " "main" {
   password = data.vault_generic_secret.db_password.data["password"]
 }
 ```
@@ -234,28 +230,6 @@ terraform:
 **Cons:**
 - CI/CD platform specific
 - Need to configure in platform UI
-
-### Method 6: Parameter Store (AWS Systems Manager)
-
-```hcl
-data "aws_ssm_parameter" "db_password" {
-  name = "/prod/database/password"
-}
-
-resource "aws_db_instance" "main" {
-  password = data.aws_ssm_parameter.db_password.value
-}
-```
-
-**Pros:**
-- Free (Standard parameters)
-- Integrated with AWS
-- Versioning support
-
-**Cons:**
-- AWS-specific
-- Standard parameters not encrypted by default
-- Use SecureString for encryption
 
 ---
 
@@ -339,7 +313,7 @@ terraform apply -var-file=terraform.tfvars -var-file=secrets.tfvars
 ```hcl
 # Only mark truly sensitive outputs
 output "db_password" {
-  value     = aws_db_instance.main.password
+  value     = azurerm_mssql_server .main.password
   sensitive = true
 }
 ```
@@ -353,46 +327,56 @@ output "db_password" {
 ## 5. Real-World Example: Database Password
 
 ### Scenario
-Create an RDS instance with a secure password from AWS Secrets Manager.
+Create an SQL instance with a secure password from Azure Keyvault
 
-**Step 1: Create secret in AWS (one-time setup):**
+**Step 1: Create secret in Azure (one-time setup):**
 ```bash
-aws secretsmanager create-secret \
-  --name prod/rds/password \
-  --secret-string '{"password":"$(openssl rand -base64 32)"}'
+az keyvault create \
+  --name myKeyVault \
+  --resource-group myResourceGroup \
+  --location uksouth
+
+az keyvault secret set \
+  --vault-name myKeyVault \
+  --name prd-sql-password \
+  --value "$(openssl rand -base64 32)"
+
+
 ```
 
 **Step 2: Terraform configuration:**
 ```hcl
-data "aws_secretsmanager_secret_version" "rds_password" {
-  secret_id = "prod/rds/password"
+data "azurerm_key_vault" "key_vault" {
+  name                = "key-vault-01"
+  resource_group_name = "mgmt-rg-01"
 }
 
-locals {
-  db_credentials = jsondecode(data.aws_secretsmanager_secret_version.rds_password.secret_string)
+data "azurerm_key_vault_secret" "server_password" {
+  name         = "prd-sql-password"
+  key_vault_id = data.azurerm_key_vault.key_vault.id
 }
 
-resource "aws_db_instance" "main" {
-  identifier     = "prod-database"
-  engine         = "postgres"
-  instance_class = "db.t3.micro"
-  
-  # Password from Secrets Manager
-  password = local.db_credentials["password"]
-  
-  # Other config...
-  allocated_storage = 20
-  
-  tags = {
-    Name = "Production Database"
+resource "azurerm_mssql_server" "example" {
+  name                         = "example-resource"
+  resource_group_name          = azurerm_resource_group.example.name
+  location                     = azurerm_resource_group.example.location
+  version                      = "12.0"
+  administrator_login          = "Example-Administrator"
+  administrator_login_password = data.azurerm_key_vault_secret.server_password
+  minimum_tls_version          = "1.2"
+
+  azuread_administrator {
+    login_username = azurerm_user_assigned_identity.example.name
+    object_id      = azurerm_user_assigned_identity.example.principal_id
   }
-}
 
-# Don't output password - fetch from Secrets Manager when needed
-output "database_endpoint" {
-  value       = aws_db_instance.main.endpoint
-  description = "RDS endpoint (password in Secrets Manager)"
-  sensitive   = false
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.example.id]
+  }
+
+  primary_user_assigned_identity_id            = azurerm_user_assigned_identity.example.id
+  transparent_data_encryption_key_vault_key_id = azurerm_key_vault_key.example.id
 }
 ```
 
@@ -414,7 +398,7 @@ terraform apply
 {
   "resources": [
     {
-      "type": "aws_db_instance",
+      "type": "azurerm_mssql_server",
       "instances": [
         {
           "attributes": {
@@ -432,40 +416,59 @@ terraform apply
 
 **1. Use Remote Backends:**
 ```hcl
-terraform {
-  backend "s3" {
-    bucket         = "terraform-state"
-    key            = "prod/database/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    kms_key_id     = "arn:aws:kms:..."
-    dynamodb_table = "terraform-locks"
+data "terraform_remote_state" "vdc" {
+  backend = "azurerm"
+  config = {
+    resource_group_name  = "tfstate-rg-01"
+    storage_account_name = "tfstatesa"
+    container_name       = "tfstate"
+    key                  = "test.tfstate"
+    subscription_id = var.subscription
   }
 }
 ```
 
 **2. Enable Encryption:**
-- S3: Server-side encryption (SSE)
-- KMS: Customer-managed keys for additional control
+- Encryption is enabled by default on Azure Blob Storage 
 
 **3. Restrict Access:**
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::123456789012:role/TerraformRole"
-      },
-      "Action": [
-        "s3:GetObject",
-        "s3:PutObject"
-      ],
-      "Resource": "arn:aws:s3:::terraform-state/*"
-    }
-  ]
-}
+
+**Create a role assignment for the Terraform identity**
+
+```bash
+az role assignment create \
+  --assignee "<terraform-principal-id-or-object-id>" \
+  --role "Storage Blob Data Contributor" \
+  --scope "/subscriptions/<sub-id>/resourceGroups/<rg>/providers/Microsoft.Storage/storageAccounts/<account>/blobServices/default/containers/<container>"
+```
+
+**Restrict network access**
+
+```bash
+az storage account update \
+  --name <account> \
+  --resource-group <rg> \
+  --default-action Deny
+
+az storage account network-rule add \
+  --resource-group <rg> \
+  --account-name <account> \
+  --vnet-name <vnet> \
+  --subnet <subnet>
+
+```
+
+**Or use Private endpoint only**
+
+```bash
+az network private-endpoint create \
+  --name <pe-name> \
+  --resource-group <rg> \
+  --vnet-name <vnet> \
+  --subnet <subnet> \
+  --private-connection-resource-id "/subscriptions/<sub-id>/resourceGroups/<rg>/providers/Microsoft.Storage/storageAccounts/<account>" \
+  --group-id blob \
+  --connection-name <connection-name>
 ```
 
 **4. Use Terraform Cloud:**
@@ -494,7 +497,7 @@ Answer: **C** - `sensitive = true` only hides values from CLI output and logs. T
 ### Question 2
 What is the best practice for managing database passwords in production Terraform configurations?
 A) Store in terraform.tfvars committed to Git
-B) Use AWS Secrets Manager or similar external secret management
+B) Use Azure Key Vault or similar external secret management
 C) Hardcode in the resource block
 D) Use default values in variable definitions
 
@@ -523,7 +526,7 @@ Answer: **B** - State files contain all resource attributes, including sensitive
 
 - **`sensitive = true`** only hides values from CLI output - they're still in state files.
 - **Never commit secrets** to version control - use `.gitignore` for `.tfvars` files with secrets.
-- **Use external secret managers** (AWS Secrets Manager, Vault) for production environments.
+- **Use external secret managers** (Azure Key Vault, etc) for production environments.
 - **Protect state files** with encryption, access controls, and remote backends.
 - **Environment variables** (`TF_VAR_*`) are simple but have limitations.
 - **State files contain all attributes** including secrets - always encrypt and restrict access.
@@ -534,7 +537,7 @@ Answer: **B** - State files contain all resource attributes, including sensitive
 ## References
 
 - [Terraform Sensitive Variables](https://developer.hashicorp.com/terraform/language/values/variables#suppressing-values-in-cli-output)
-- [AWS Secrets Manager Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret_version)
+- [AzureRM Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault)
 - [HashiCorp Vault Provider](https://registry.terraform.io/providers/hashicorp/vault/latest/docs)
 - [State File Security](https://developer.hashicorp.com/terraform/language/state/sensitive-data)
 

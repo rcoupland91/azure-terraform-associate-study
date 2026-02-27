@@ -1,7 +1,7 @@
 # Terraform Associate Study Guide
 
 ##
-This has been updated and amended to remove the AWS components and change them for Azure components to fit in-line with and understanding of Terraforom alongside a provider I use regularly.  This won't change the actual fundamentals of this repo but rather may help more Azure focused people to understand some of the contents.
+This has been updated and amended to remove the AWS components and change them for Azure components to fit in-line with and the understanding of Terrafrom alongside a provider I use regularly.  This won't change the actual fundamentals of this repo but rather may help more Azure focused people to understand some of the contents.
 
 A collection of hands-on notes, labs, and explanations created while studying for the **HashiCorp Certified: Terraform Associate** exam.  
 This repository focuses on real-world understanding — not just passing the test — by connecting concepts like state, variables, modules, and backends to how they're used in AWS environments.
@@ -43,7 +43,7 @@ This study guide has been updated to align with **Exam 004** and Terraform 1.12.
 
 - [00 – Getting Started](00-Getting-Started/) — orientation, study tips, and foundational commands.
   - [Intro to Terraform](00-Getting-Started/01-intro-to-terraform.md)
-  - [Automating AWS Deployments with Terraform](00-Getting-Started/02-automating-aws-deployments-with-terraform.md)
+  - [Automating Azure Deployments with Terraform](00-Getting-Started/02-automating-azure-deployments-with-terraform.md)
   - [Troubleshooting and Debugging Terraform](00-Getting-Started/03-troubleshooting-and-debugging-terraform.md)
 - [01 – Understand Infrastructure as Code](01-Understand-Infrastructure-as-Code/) — benefits, workflows, and IaC mindset.
 - [02 – Terraform Basics and CLI](02-Terraform-Basics-and-CLI/) — everyday commands, workflow, and execution patterns.
@@ -95,7 +95,7 @@ This study guide has been updated to align with **Exam 004** and Terraform 1.12.
 13. Study [Custom Validation Rules](03-Terraform-Configuration-Language/04-custom-validation-rules.md) (new in Exam 004!)
 14. Study [Ephemeral Values & Write-Only Arguments](03-Terraform-Configuration-Language/05-ephemeral-values-write-only.md) (new in Exam 004!)
 15. Review [Troubleshooting](00-Getting-Started/03-troubleshooting-and-debugging-terraform.md) to handle common issues
-16. Optional: [Automating AWS Deployments](00-Getting-Started/02-automating-aws-deployments-with-terraform.md) and [HCP Terraform](07-Terraform-Cloud-and-Enterprise/01-terraform-cloud-enterprise.md)
+16. Optional: [Automating Azure Deployments](00-Getting-Started/02-automating-azure-deployments-with-terraform.md) and [HCP Terraform](07-Terraform-Cloud-and-Enterprise/01-terraform-cloud-enterprise.md)
 
 **THE EXAM / INTERVIEW MEMORY HACK**
 
@@ -133,7 +133,7 @@ This study guide has been updated to align with **Exam 004** and Terraform 1.12.
 - ✅ [Secrets Management](08-Security-and-Best-Practices/01-secrets-management.md) basics
 
 **Lower Priority (Review if time):**
-- ✅ [Automating AWS Deployments](00-Getting-Started/02-automating-aws-deployments-with-terraform.md) (helpful for real-world)
+- ✅ [Automating Azure Deployments](00-Getting-Started/02-automating-azure-deployments-with-terraform.md) (helpful for real-world)
 - ✅ [Troubleshooting](00-Getting-Started/03-troubleshooting-and-debugging-terraform.md) (good for understanding errors)
 
 ---
@@ -148,17 +148,17 @@ This study guide has been updated to align with **Exam 004** and Terraform 1.12.
 
 ## Prerequisites
 
-- AWS account (for labs)
+- Azure account (for labs)
 - Terraform CLI (v1.12+) - Required for Exam 004
-- AWS CLI (configured credentials)
-- Basic knowledge of AWS services (EC2, S3, IAM)
+- Azure CLI (configured credentials)
+- Basic knowledge of Azure services (VMs, Storage Accounts, RBAC)
 
 ---
 
 ## About This Repo
 
 This repo serves as both a personal learning record and a resource for others preparing for the Terraform Associate certification.  
-Each section includes concise explanations, CLI commands, and hands-on lab code that mirrors real-world workflows in AWS.
+Each section includes concise explanations, CLI commands, and hands-on lab code that mirrors real-world workflows in Azure.
 
 **Recently Enhanced:** 
 - All content updated for Terraform 1.12 and Exam 004 alignment.
@@ -184,10 +184,10 @@ Happy studying, and good luck on the Terraform Associate exam!
 ---
 
 ## Created by
-
 **Rafael Martinez** — Cloud Engineer | AWS & Azure | DevOps | Founder of Terminals&Coffee   
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/rgmartinez-cloud/)
-[![GitHub](https://img.shields.io/badge/GitHub-TerminalsandCoffee-black?logo=github)](https://github.com/TerminalsandCoffee)
+## Edited for Azure by
+**Ryan Coupland** — Senior Cloud Engineer | Azure Specialist
 
-> ☕ Support this project: [https://buymeacoffee.com/terminalsandcoffee](https://buymeacoffee.com/terminalsandcoffee)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/ryan-coupland-90539464/)
+[![GitHub](https://img.shields.io/badge/GitHub-rcoupland91-black?logo=github)](https://github.com/rcoupland91)

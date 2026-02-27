@@ -11,8 +11,8 @@
 ## 1. Overview
 Terraform errors usually fall into a few buckets:
 
-- Backend/state problems (S3, DynamoDB, locking)
-- Auth/provider problems (AWS creds, region, profile)
+- Backend/state problems (Storage Accounts, resource locks)
+- Auth/provider problems (Azure creds, region, profile)
 - Drift or “resource already exists” problems
 - Bad config problems (syntax, wrong refs, cycles)
 - Provisioner / apply-time problems
@@ -44,34 +44,31 @@ After that, check `terraform.log` in the current folder. Turn it off when done:
 unset TF_LOG
 ```
 
-## 3. Common Error: "Error loading state: AccessDenied" (S3 backend)
+## 3. Common Error: "Error loading state: AccessDenied" (Azure Storage Account backend)
 
 **What it means:**
-- Terraform tried to read/write state to S3 and AWS blocked it.
-- Usually wrong IAM policy, wrong bucket, or wrong KMS/encryption setting.
+- Terraform tried to read/write state to the Storage Account and Azure blocked it.
+- Usually wrong azure app reg attempting to access with wrong perms, wrong storage account
 
 **Checklist:**
 
-1. Check S3 bucket name in backend:
+1. Check AzureRM tfstate name in backend:
 
    ```hcl
-   backend "s3" {
-     bucket = "terraform-state-bucket"
-     key    = "global/terraform.tfstate"
-     region = "us-east-1"
+   backend "azurerm" {
+    resource_group_name  = "testrg"
+    storage_account_name = "testtfstatesa"
+    container_name       = "test-tfstate"
+    key = "testfile.tfstate"
+
    }
    ```
 
-2. Confirm your IAM has:
-   - s3:GetObject
-   - s3:PutObject
-   - s3:ListBucket  
-     on that bucket.
-
-3. If you use DynamoDB for locking, also check:
-   - dynamodb:GetItem
-   - dynamodb:PutItem
-   - dynamodb:DeleteItem
+2. Confirm your App Reg has correct RBAC perms :
+   - store
+   - read
+   - lock
+   - update
 
 If your pipeline fails with:  
 Error loading state: AccessDenied: Access Denied  
@@ -94,7 +91,7 @@ Happens when:
 
    LOCK_ID will be in the error message.
 
-2. If using DynamoDB, you can also delete the lock item manually (AWS CLI), but force-unlock is safer.
+2. If using resource locks, you can also remove the lock item manually (Azure Storage account/Resource Group lock)
 
 ## 5. Common Error: "Resource already exists"
 This shows up when:
@@ -108,14 +105,19 @@ This shows up when:
 **Option A: Import it**
 
 ```bash
-terraform import aws_s3_bucket.logs my-logs-bucket
+terraform import -var-file ".tfvars" -var-file ".tfvars" $TerraformResource $ResourceID
 ```
 
 **Option B: Rename / change resource name in config**  
 Use terraform state mv if you messed up the name:
 
 ```bash
-terraform state mv aws_instance.old aws_instance.new
+terraform state mv module.testapp_vm module.testapp_vm[0]
+```
+
+Or
+```bash
+terraform state mv module.testapp_vm module.testapp_vm["run"]
 ```
 
 ## 6. Common Error: "Dependency cycle"
@@ -132,11 +134,11 @@ Terraform can’t figure out which resource to create first.
 - Sometimes use depends_on  
   **Example:**
 
-  ```hcl
-  resource "aws_iam_role_policy_attachment" "attach" {
-    role       = aws_iam_role.app_role.name
-    policy_arn = aws_iam_policy.app_policy.arn
-    depends_on = [aws_iam_policy.app_policy]
+  ```bash
+  resource "azurerm_private_endpoint" "test-endpoint" {
+  depends_on = [
+    azurerm_private_endpoint.first-endpoint,
+  ]
   }
   ```
 
@@ -152,8 +154,8 @@ it usually means:
 
 **What to check:**
 
-- Does the instance have a public IP?
-- Is security group allowing SSH (22) from your runner / your IP?
+- Does the VM have a public IP?
+- Is security group allowing SSH (22) from your runner(or agent) / your IP?
 - Is the SSH user correct? (ubuntu vs ec2-user vs centos)
 - Add a sleep:
 
@@ -170,10 +172,10 @@ Or better: move config to user_data.
 
 ## 8. State Surgery (When Things Are Out of Sync)
 
-**A. Remove something from state but don’t delete in AWS:**
+**A. Remove something from state but don’t delete in Azure:**
 
 ```bash
-terraform state rm aws_instance.old
+terraform state rm azure_vm.old
 ```
 
 Use when Terraform thinks it owns a resource but it shouldn’t.
@@ -181,7 +183,7 @@ Use when Terraform thinks it owns a resource but it shouldn’t.
 **B. Rename something in state:**
 
 ```bash
-terraform state mv aws_instance.web aws_instance.web01
+terraform state mv azure_vm.web azure_vm.web01
 ```
 
 Use when you copied a block and changed the name but Terraform is confused.
@@ -190,7 +192,7 @@ Use when you copied a block and changed the name but Terraform is confused.
 
 ```bash
 terraform state list
-terraform state show aws_instance.web
+terraform state show azure_vm.web
 ```
 
 ## 9. Drift Detection
@@ -203,46 +205,20 @@ terraform refresh
 
 (Heads up: refresh is being phased/moved in newer versions — but the idea is “sync with remote.”)
 
-## 10. Provider/AWS Credential Problems
-If you see:
-
-- NoCredentialProviders
-- error configuring S3 Backend: NoCredentialProviders
-
-Then:
-
-- Check env vars: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION
-- If using profile:
-
-  ```hcl
-  provider "aws" {
-    region  = "us-east-1"
-    profile = "cleardata"
-  }
-  ```
-
-Run:
-
-```bash
-aws sts get-caller-identity
-```
-
-If that fails, Terraform will fail too. Fix AWS CLI first.
-
-## 11. Good Troubleshooting Flow
+## 10. Good Troubleshooting Flow
 
 1. terraform init (does backend work?)
 2. terraform validate (is the config valid?)
 3. terraform plan (does the provider/auth/state work?)
 4. export TF_LOG=DEBUG and re-run if still broken
-5. Check S3/DynamoDB permissions
+5. Check Storage Account permissions
 6. If state is stuck → terraform force-unlock
 7. If resource name is wrong → terraform state mv
 8. If console drift → terraform plan → apply
 
 ---
 
-## 12. Practice Questions
+## 11. Practice Questions
 
 ### Question 1
 What is the first step when encountering a vague Terraform error?  
@@ -281,5 +257,5 @@ D) `terraform state delete`
 
 <details>
 <summary>Show Answer</summary>
-Answer: **B** - `terraform state rm` removes a resource from state, but leaves the actual infrastructure intact in AWS. This is useful when moving resources between Terraform configurations or if a resource is now managed elsewhere.
+Answer: **B** - `terraform state rm` removes a resource from state, but leaves the actual infrastructure intact in Azure. This is useful when moving resources between Terraform configurations or if a resource is now managed elsewhere.
 </details>

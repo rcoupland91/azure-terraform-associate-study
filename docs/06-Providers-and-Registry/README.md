@@ -14,14 +14,14 @@
   ```hcl
   terraform {
     required_providers {
-      aws = {
-        source  = "hashicorp/aws"
+      azurerm = {
+        source  = "hashicorp/azurerm"
         version = "~> 5.0"
       }
     }
   }
   ```
-- Use multiple providers with aliases: `provider "aws" { alias = "use2" }`
+- Use multiple providers with aliases: `provider "azurerm" { alias = "use2" }`
 - Lock providers: `terraform providers lock -platform=linux_amd64`
 
 ## Official documentation

@@ -2,7 +2,7 @@
 
 Terraform is an open-source **Infrastructure as Code (IaC)** tool developed by **HashiCorp**. It lets you define, provision, and manage infrastructure using simple configuration files instead of clicking through cloud consoles.
 
-Terraform works across multiple cloud providers, but in this repository, the main focus is on **AWS**, since it’s the most widely used platform in real-world DevOps and Cloud Engineering projects.
+Terraform works across multiple cloud providers, but in this repository, the main focus is on **Azure**, since it’s the most widely used platform in real-world DevOps and Cloud Engineering projects.
 
 This document provides a practical introduction to Terraform — what it is, how it works, and why it’s essential for anyone building and managing modern cloud infrastructure.
 
@@ -51,41 +51,46 @@ This workflow makes Terraform a powerful tool for both production infrastructure
 
 ---
 
-## Managing AWS Services with Terraform
+## Managing Azure Services with Terraform
 
-Terraform connects to AWS through the **AWS provider** — a plugin that exposes all AWS resources (EC2, S3, IAM, VPCs, etc.) to Terraform.
+Terraform connects to Azure through the **AzureRM provider** — a plugin that exposes all Azure resources (Virtual machines, Storage Accounts, VNETs, Keyvaults, etc.) to Terraform.
 
 Example provider setup:
 
 ```hcl
-provider "aws" {
-  region = "us-west-2"
+provider "azurerm" {
+ resource_provider_registrations = "none"
+ subscription_id                 = local.subscription_id
+ tenant_id                       = var.tenant_id
+ features {}
 }
 ```
 
-**Example: Provisioning an EC2 Instance**
+**Example: Provisioning a Keyvault Instance**
 
 ```hcl
-resource "aws_instance" "example" {
-  ami           = "ami-0123456789abcdef0"  # Example AMI ID - use data source for real deployments
-  instance_type = "t2.micro"
+resource "azurerm_key_vault" "example" {
+  name                        = "examplekeyvault"
+  location                    = "uksouth"
+  resource_group_name         = "testresourcegroup"
+  tenant_id                   = "29334838934093843894328" #test tenant ID
 }
 ```
 
-This small configuration defines and deploys an EC2 instance automatically — no console clicks required.
+This small configuration defines and deploys a basic keyvault instance automatically — no console clicks required.
 
 ---
 
-## Common AWS Resources Managed with Terraform
+## Azure Resources Managed with Terraform
 
-* EC2 Instances
-* S3 Buckets
-* IAM Roles & Policies
-* VPCs and Subnets
-* Security Groups
-* Lambda Functions
-* DynamoDB Tables
-* CloudWatch and CloudTrail configuration
+* Virtual Machines
+* Storage Accounts
+* Key Vaults
+* VNETs and Subnets
+* NSGs
+* Function Apps
+* SQL MI
+* Frontdoor/Application Gateways
 
 ---
 
@@ -95,22 +100,24 @@ Terraform’s **HCL** (HashiCorp Configuration Language) is declarative — you 
 
 **Core building blocks:**
 
-* **Provider:** Connects Terraform to a cloud or platform (like AWS).
-* **Resource:** Represents infrastructure components (e.g., EC2, S3).
+* **Provider:** Connects Terraform to a cloud or platform (like AzureRM).
+* **Resource:** Represents infrastructure components (e.g., VM, Storage Account).
 * **Variable:** Adds flexibility by letting you reuse values.
 * **Output:** Displays key information after deployment (e.g., public IPs).
 
 Example with a variable:
 
 ```hcl
-variable "instance_type" {
-  description = "EC2 instance type"
-  default     = "t2.micro"
+variable "location" {
+  description = "Location of Keyvault"
+  default     = "uksouth"
 }
 
-resource "aws_instance" "my_instance" {
-  ami           = "ami-0123456789abcdef0"  # Example AMI ID - use data source for real deployments
-  instance_type = var.instance_type
+resource "azurerm_key_vault" "example" {
+  name                        = "examplekeyvault"
+  location                    = var.location
+  resource_group_name         = "testresourcegroup"
+  tenant_id                   = "29334838934093843894328" #test tenant ID
 }
 ```
 
@@ -120,7 +127,7 @@ resource "aws_instance" "my_instance" {
 
 A typical Terraform configuration includes:
 
-* **`provider.tf`** – provider setup (AWS, etc.)
+* **`provider.tf`** – provider setup (AzureRM, etc.)
 * **`variables.tf`** – declared variables
 * **`main.tf`** – main infrastructure resources
 * **`outputs.tf`** – key output values (IP addresses, URLs, etc.)
@@ -176,5 +183,5 @@ Answer: **B** - HCL stands for HashiCorp Configuration Language, the declarative
 Terraform bridges the gap between infrastructure and automation.
 It helps teams move faster, stay consistent, and version everything from compute to networking.
 
-In this repo, you'll find guided labs and examples — starting simple and progressing toward advanced automation with **workspaces, backends, and CI/CD integration** — all built around real AWS use cases.
+In this repo, you'll find guided labs and examples — starting simple and progressing toward advanced automation with **workspaces, backends, and CI/CD integration** — all built around real Azure use cases.
 

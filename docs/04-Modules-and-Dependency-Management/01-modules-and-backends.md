@@ -26,7 +26,7 @@ Modules help you:
 - Share architecture blueprints with teams
 
 **Example use case:**  
-Instead of writing EC2, VPC, and security group resources multiple times, you define them once in a module and call it wherever needed.
+Instead of writing VNET, Subnets, and network security group resources multiple times, you define them once in a module and call it wherever needed.
 
 ---
 
@@ -35,7 +35,7 @@ Instead of writing EC2, VPC, and security group resources multiple times, you de
 A simple reusable module usually includes:
 
 ```
-my-vpc-module/
+my-vnet-module/
 ├── main.tf          # defines the actual resources
 ├── variables.tf     # defines inputs
 ├── outputs.tf       # defines what values get returned
@@ -45,8 +45,8 @@ my-vpc-module/
 Then your root module (where you run Terraform) can call it like this:
 
 ```hcl
-module "vpc" {
-  source = "./modules/my-vpc-module"
+module "vnet" {
+  source = "./modules/my-vnet-module"
   cidr_block = "10.0.0.0/16"
   env = "dev"
 }
@@ -58,12 +58,12 @@ module "vpc" {
 
 Terraform can load modules from multiple sources:
 
-| Source Type            | Example                                                                   | Use Case                 |
-| ---------------------- | ------------------------------------------------------------------------- | ------------------------ |
-| **Local path**         | `source = "./modules/vpc"`                                                | Within your project      |
-| **Git repo**           | `source = "git::https://github.com/TerminalsandCoffee/terraform-vpc.git"` | Shared code or team repo |
-| **Terraform Registry** | `source = "terraform-aws-modules/vpc/aws"`                                | Public community modules |
-| **S3 bucket / GCS**    | `source = "s3::https://s3.amazonaws.com/terraform-modules/vpc.zip"`       | Private hosted modules   |
+| Source Type            | Example                                                                                              | Use Case                 |
+| ---------------------- | -----------------------------------------------------------------------------------------------------| ------------------------ |
+| **Local path**         | `source = "./modules/vnet"`                                                                          | Within your project      |
+| **Git repo**           | `source = "git::https://github.com/TerminalsandCoffee/terraform-vpc.git"`                            | Shared code or team repo |
+| **Terraform Registry** | `source = "terraform-azurerm-avm-res-network-virtualnetwork"`                                        | Public community modules |
+| **Storage Account**    | `source = "azurerm://<storage-account-name>.blob.core.windows.net/<container>/<path-to-zip>"`        | Private hosted modules   |
 
 ---
 
@@ -76,7 +76,7 @@ Modules use **input variables** to accept configuration values from the caller.
 ```hcl
 variable "cidr_block" {
   type        = string
-  description = "VPC CIDR range"
+  description = "vnet CIDR range"
 }
 
 variable "env" {
@@ -88,8 +88,8 @@ variable "env" {
 **In the root module (where module is called):**
 
 ```hcl
-module "vpc" {
-  source      = "./modules/vpc"
+module "vnet" {
+  source      = "./modules/vnet"
   cidr_block  = "10.0.0.0/16"
   env         = "prod"
 }
@@ -104,24 +104,24 @@ Modules can export values (like resource IDs) to the root module.
 **Inside the module (`outputs.tf`):**
 
 ```hcl
-output "vpc_id" {
-  description = "ID of the created VPC"
-  value       = aws_vpc.main.id
-}
+output "vnet_id" { 
+  description = "ID of the created VNet" 
+  value = azurerm_virtual_network.main.id 
+  }
 ```
 
 **In the root module:**
 
 ```hcl
-output "vpc_id" {
-  value = module.vpc.vpc_id
+output "vnet_id" {
+  value = module.vnet.vnet_id
 }
 ```
 
 Run:
 
 ```bash
-terraform output vpc_id
+terraform output vnet_id
 ```
 
 ---
@@ -131,64 +131,68 @@ terraform output vpc_id
 **Folder structure:**
 
 ```
-terraform-associate-study/
+azure-terraform-associate-study/
 ├── main.tf
 └── modules/
-    └── s3_bucket/
+    └── storage_account/
         ├── main.tf
         ├── variables.tf
         └── outputs.tf
 ```
 
-**s3_bucket/main.tf:**
+**storage_account/main.tf:**
 
 ```hcl
-resource "aws_s3_bucket" "this" {
-  bucket = var.bucket_name
-  tags = {
-    Environment = var.env
-  }
+resource "azurerm_storage_account" "example" {
+
+  name                      = var.sa_name
+  resource_group_name       = "test-rg"
+  location                  = var.location
+  account_tier              = "Standard"
+  account_replication_type  = each.value.replication_type
+  shared_access_key_enabled = false
 }
 ```
 
-**s3_bucket/variables.tf:**
+**storage_account/variables.tf:**
 
 ```hcl
-variable "bucket_name" {
+variable "location" {
   type        = string
-  description = "Name of the S3 bucket"
+  description = "Location of resource"
 }
 
-variable "env" {
+variable "sa_name" {
   type        = string
-  default     = "dev"
+  description = "SA Name"
 }
 ```
 
-**s3_bucket/outputs.tf:**
+**storage_account/outputs.tf:**
 
 ```hcl
-output "bucket_arn" {
-  value       = aws_s3_bucket.this.arn
-  description = "ARN of the created bucket"
+output "sa_name" {
+  value       = azurerm_storage_account.example.name
+  description = "Name of the Storage Account"
 }
 ```
 
 **main.tf (root):**
 
 ```hcl
-provider "aws" {
-  region = "us-east-1"
+provider "azurerm" {
+  region = "uksouth"
 }
 
 module "storage" {
-  source      = "./modules/s3_bucket"
-  bucket_name = "my-terraform-study-bucket"
+  source      = "./modules/storage_account"
+  sa_name = "test-sa"
+  location = "uksouth"
   env         = "dev"
 }
 
-output "bucket_arn" {
-  value = module.storage.bucket_arn
+output "sa_name" {
+  value = module.storage.sa_name
 }
 ```
 
@@ -208,31 +212,28 @@ It determines how state is loaded, stored, and locked during operations.
 
 Without a backend, Terraform defaults to a **local backend** — `terraform.tfstate` in your working directory.
 
-You can configure a **remote backend** for shared, secure state (e.g., AWS S3, Terraform Cloud).
+You can configure a **remote backend** for shared, secure state (e.g., Azure Storage Containers, Terraform Cloud).
 
 ---
 
-## 9. Backend Example (S3 + DynamoDB)
+## 9. Backend Example (Storage Account/Container)
 
 ```hcl
 terraform {
-  backend "s3" {
-    bucket         = "terraform-study-state"
-    key            = "network/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "state-locking"
-    encrypt        = true
+  backend "azurerm" {
+    resource_group_name   = "my-tfstate-rg"
+    storage_account_name  = "mytfstateaccount"
+    container_name        = "tfstate"
+    key                   = "network/terraform.tfstate"
   }
 }
+
 ```
 
 ### Key points:
 
-* `bucket`: where the state file is stored
-* `key`: path within the bucket
-* `region`: AWS region
-* `dynamodb_table`: optional — adds state locking
-* `encrypt = true`: enables SSE encryption at rest
+* `container_name`: where the state file is stored
+* `key`: Path to the state file
 
 Run:
 
@@ -264,12 +265,12 @@ terraform init -migrate-state
 
 Common backend types and their use cases:
 
-| Backend                          | Use Case                                       | Supports Locking? |
-| -------------------------------- | ---------------------------------------------- | ----------------- |
-| **local**                        | Simple, single-user local files                | ❌ No              |
-| **s3**                           | Team collaboration via AWS S3 + DynamoDB       | ✅ Yes             |
-| **terraform cloud / enterprise** | Managed remote state with workspace automation | ✅ Yes             |
-| **azurerm / gcs / consul**       | Platform-specific remote storage               | ✅ Varies          |
+| Backend                          | Use Case                                       | Supports Locking?                         ` |
+| -------------------------------- | ---------------------------------------------- | ------------------------------------------  |
+| **local**                        | Simple, single-user local files                | ❌ No                                       | 
+| **s3**                           | Team collaboration via AWS S3 + DynamoDB       | ✅ Yes                                      |
+| **terraform cloud / enterprise** | Managed remote state with workspace automation | ✅ Yes                                      |
+| **azurerm**                      | Platform-specific remote storage               | ✅ Yes, with Azure Blob Storage leases      |
 
 ---
 
@@ -300,10 +301,10 @@ Common backend types and their use cases:
 
 ### Question 1
 Which module source type would you use to load a module from a Git repository?
-A) `source = "./modules/vpc"`
+A) `source = "./modules/vnet"`
 B) `source = "git::https://github.com/user/module.git"`
-C) `source = "terraform-aws-modules/vpc/aws"`
-D) `source = "modules/vpc"`
+C) `source = "terraform-azurerm-modules/vnet/azurerm"`
+D) `source = "modules/vnet"`
 
 <details>
 <summary>Show Answer</summary>
@@ -345,7 +346,7 @@ Answer: **B** - The `required_providers` block declares provider dependencies an
 * **Modules** group resources and make Terraform reusable, maintainable, and modular.
 * **Inputs** pass data *into* a module; **outputs** pass data *out*.
 * **Backends** control *where* Terraform stores state (local vs remote).
-* **Remote backends (S3 + DynamoDB)** provide collaboration, encryption, and locking.
+* **Remote backends (Storage Account/Blob Storage)** provide collaboration, encryption, and locking.
 * Backend config is static — cannot depend on variables.
 * Together, modules and backends form the foundation of scalable Terraform architecture.
 
@@ -355,5 +356,5 @@ Answer: **B** - The `required_providers` block declares provider dependencies an
 
 * [Terraform Modules Documentation](https://developer.hashicorp.com/terraform/language/modules)
 * [Terraform Backends Documentation](https://developer.hashicorp.com/terraform/language/settings/backends)
-* [Terraform Registry - AWS Modules](https://registry.terraform.io/namespaces/terraform-aws-modules)
-* [AWS Backend Example (S3)](https://developer.hashicorp.com/terraform/language/settings/backends/s3)
+* [Terraform Registry - Azure Modules](https://registry.terraform.io/namespaces/Azure)
+* [Azure Backend Example (Blob Storage)](https://developer.hashicorp.com/terraform/language/backend/azurerm)

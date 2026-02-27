@@ -18,7 +18,6 @@
 ## Official documentation
 - [Sensitive Data Handling](https://developer.hashicorp.com/terraform/language/values/variables#sensitive-variables)
 - [Security Best Practices](https://developer.hashicorp.com/terraform/cloud-docs/security)
-- [Terraform and KMS](https://developer.hashicorp.com/terraform/tutorials/aws/aws-kms-encryption)
 
 ## Hands-on task
 Create a variables file and encrypt it with GPG:

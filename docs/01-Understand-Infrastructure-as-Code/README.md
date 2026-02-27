@@ -12,7 +12,7 @@
 
 ## Official documentation
 - [Infrastructure as Code Overview](https://developer.hashicorp.com/terraform/intro/core-workflow)
-- [Terraform Recommended Practices](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/infrastructure-as-code)
+- [Terraform Recommended Practices](https://developer.hashicorp.com/terraform/tutorials/azure-get-started)
 - [Version Control Best Practices](https://developer.hashicorp.com/terraform/cloud-docs/vcs)
 
 ## The Terraform File Structure

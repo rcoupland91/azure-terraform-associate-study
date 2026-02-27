@@ -25,14 +25,14 @@ terraform workspace select dev
 **Example:**
 
 ```hcl
-resource "aws_s3_bucket" "demo" {
-  bucket = "demo-${terraform.workspace}-bucket"
+resource "azurerm_storage_container" "demo" {
+  name = "demo-${terraform.workspace}-container"
 }
 ```
 
 When applied in each workspace:  
-- `dev` → creates `demo-dev-bucket`  
-- `prod` → creates `demo-prod-bucket`
+- `dev` → creates `demo-dev-container`  
+- `prod` → creates `demo-prod-container`
 
 **Best Practice:**  
 Use workspaces for small environment differences. For major variations, use separate folders or repos.
@@ -47,28 +47,25 @@ Data sources allow Terraform to query existing resources and reuse their attribu
 **Example:**
 
 ```hcl
-data "aws_vpc" "default" {
-  default = true
-}
+data "terraform_remote_state" "network" {
+  backend = "azurerm"
+  config = {
+    resource_group_name  = "state-rg"
+    storage_account_name = "statesa"
+    container_name       = "state-tfstate"
+    key = "state.tfstate"
 
-data "aws_subnet_ids" "default" {
-  vpc_id = data.aws_vpc.default.id
-}
-
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"] # Canonical (Ubuntu)
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-*-amd64-server-*"]
+    subscription_id = {SubID}
   }
 }
 
-resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
-  subnet_id     = data.aws_subnet_ids.default.ids[0]
+resource "azurerm_private_endpoint" "pe_aisearch" {
+  name                = "name-pe"
+  location            = var.location
+  resource_group_name = "pe-rg"
+  subnet_id           = data.terraform_remote_state.network.outputs.subnet_ids[<subnetnames-as-per-output>]
 }
+
 ```
 
 **Key Point:**  
@@ -88,36 +85,136 @@ Provisioners let you execute scripts or commands after a resource is created. Th
 **Example: local-exec**
 
 ```hcl
-resource "aws_instance" "example" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
+resource "azurerm_linux_virtual_machine" "example" {
+  name                = "example-vm"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  size                = "Standard_B1s"
+  admin_username      = "azureuser"
+
+  network_interface_ids = [
+    azurerm_network_interface.example.id
+  ]
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
+  }
 
   provisioner "local-exec" {
-    command = "echo ${self.public_ip} >> public_ips.txt"
+    command = "echo ${self.public_ip_address} >> public_ips.txt"
   }
 }
+
 ```
 
 **Example: remote-exec**
 
 ```hcl
-resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
-  key_name      = "terraform-key"
+resource "azurerm_resource_group" "main" {
+  name     = "example-rg"
+  location = "uksouth"
+}
+
+resource "azurerm_virtual_network" "main" {
+  name                = "example-vnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+}
+
+resource "azurerm_subnet" "main" {
+  name                 = "example-subnet"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_network_security_group" "ssh" {
+  name                = "allow-ssh"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_public_ip" "main" {
+  name                = "example-ip"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  allocation_method   = "Dynamic"
+}
+
+resource "azurerm_network_interface" "main" {
+  name                = "example-nic"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.main.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.main.id
+  }
+}
+
+resource "azurerm_network_interface_security_group_association" "ssh" {
+  network_interface_id      = azurerm_network_interface.main.id
+  network_security_group_id = azurerm_network_security_group.ssh.id
+}
+
+resource "azurerm_linux_virtual_machine" "example" {
+  name                = "example-vm"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  size                = "Standard_B1s"
+  admin_username      = "azureuser"
+
+  network_interface_ids = [
+    azurerm_network_interface.main.id
+  ]
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
+  }
 
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update -y",
-      "sudo apt-get install nginx -y"
+      "echo 'Hello from remote-exec' > /tmp/hello.txt"
     ]
-  }
 
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = file("~/.ssh/terraform-key.pem")
-    host        = self.public_ip
+    connection {
+      type        = "ssh"
+      host        = azurerm_public_ip.main.ip_address
+      user        = "azureuser"
+      private_key = file("~/.ssh/id_rsa")
+    }
   }
 }
 ```
@@ -141,7 +238,7 @@ Use provisioners sparingly and only when other options (like user_data, cloud-in
 2. Then run the import command:
 
 ```bash
-terraform import aws_s3_bucket.demo mybucket
+terraform import storage_account.demo my-sa
 ```
 After import – reality check
 
@@ -149,10 +246,8 @@ State now knows everything about the real resource
 Your config must still match reality (attributes, tags, etc.)
 You’ll likely need to manually clean up/fix the config afterward
 
-Memory Trick (never forget this!)
 Import moves: Real world → State file
 Import does NOT generate or fix your config!
-This is the #1 thing juniors get wrong — import is NOT magic code-generation.
 
 ---
 
@@ -163,8 +258,8 @@ This is the #1 thing juniors get wrong — import is NOT magic code-generation.
    terraform workspace new dev
    terraform workspace new prod
    ```  
-2. Deploy an EC2 instance using a **data source** to fetch the latest Ubuntu AMI.  
-3. Add a **local-exec** provisioner to log the instance’s public IP into a text file.  
+2. Deploy an Virtual Machine using a **data source** to fetch the latest Ubuntu Image.  
+3. Add a **local-exec** provisioner to log the VMs public IP into a text file.  
 4. Switch between `dev` and `prod` workspaces to confirm each maintains its own instance and state.  
 5. Clean up resources when done:  
    ```bash
@@ -202,7 +297,7 @@ Answer: **A** - Terraform always operates in the current workspace. If you haven
 What is the main difference between a data source and a resource?
 A) Data sources are read-only, resources are managed
 B) Data sources cost money, resources are free
-C) Data sources only work with AWS, resources work everywhere
+C) Data sources only work with Azure, resources work everywhere
 D) There is no difference
 
 <details>

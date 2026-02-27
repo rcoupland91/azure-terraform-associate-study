@@ -2,7 +2,7 @@
 
 ## Learning Objectives
 - Understand what Terraform state is and why it’s critical.
-- Learn how to configure **remote state** storage using AWS S3 and DynamoDB.
+- Learn how to configure **remote state** storage using Blob Storage in Azure
 - Explore best practices for securing and managing state files.
 - Understand **state locking**, **migration**, and **drift detection**.
 
@@ -40,40 +40,38 @@ Lose it, and Terraform forgets your infrastructure.
 - Risks: lost state, drift, no collaboration, secrets exposure
 
 ### Remote State
-- Stored in a shared backend (AWS S3, Terraform Cloud, etc.)
+- Stored in a shared backend (Azure Blob Storage, Terraform Cloud, etc.)
 - Enables team collaboration
 - Secures access, adds locking, and provides durability
 
-### Interview one-liner:
-“S3 backend + DynamoDB for state locking is the most common production setup.”
-
 ---
 
-## ☁️ 3. Using AWS for Remote State
+## ☁️ 3. Using Azure for Remote State
 
-### Step 1: Create an S3 bucket and DynamoDB table
+### Step 1: Creating the backend resources
 
 ```bash
-aws s3api create-bucket --bucket my-terraform-state-bucket --region us-east-1
+az group create -n tfstate-rg -l uksouth
 
-aws dynamodb create-table \
-  --table-name terraform-locks \
-  --attribute-definitions AttributeName=LockID,AttributeType=S \
-  --key-schema AttributeName=LockID,KeyType=HASH \
-  --billing-mode PAY_PER_REQUEST
+az storage account create -n tfstateaccount01 -g tfstate-rg -l uksouth --sku Standard_LRS
+
+az storage container create --account-name tfstateaccount01 -n tfstate
+
+## Azure automatically encrypts data at rest
 ```
+
 
 ### Step 2: Configure the backend
 ```bash
 terraform {
-  backend "s3" {
-    bucket         = "my-terraform-state-bucket"
-    key            = "dev/network/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "terraform-locks"
-    encrypt        = true
+  backend "azurerm" {
+    resource_group_name   = "tfstate-rg"
+    storage_account_name  = "tfstateaccount01"
+    container_name        = "tfstate"
+    key                   = "dev/network/terraform.tfstate"
   }
 }
+
 ```
 Then run: 
 ```
@@ -87,8 +85,8 @@ Terraform will ask to migrate local state → remote backend.
 
 To prevent two people running terraform apply simultaneously:
 
-- DynamoDB table enables state locking.
-- Terraform automatically locks before changes and releases after.
+- Azure uses Blob Leases for locking.
+- When Terraform runs, it acquires a lease on the .tfstate blob.
 - If locked, you’ll see:
 
 ```
@@ -108,16 +106,11 @@ Used carefully — only when you KNOW no process is running.
 
 | Practice                               | Purpose                                        |
 | -------------------------------------- | ---------------------------------------------- |
-| Encrypt state in S3 (`encrypt = true`) | Protect secrets in transit and at rest         |
-| Restrict IAM access                    | Only admins/CI should access the state bucket  |
-| Enable S3 versioning                   | Recover corrupted or deleted state             |
+| Restrict  access                       | Only admins/CI should access the blob container  |
+| Enable Storage Account versioning      | Recover corrupted or deleted state             |
 | Use `prevent_destroy` lifecycle rule   | Avoid accidental destruction of critical infra |
 | Never commit `.tfstate` files          | They may contain secrets                       |
 
-Optional KMS encryption:
-```
-kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/abcd1234-..."
-```
 ---
 
 ## 6. Important Commands
@@ -136,7 +129,7 @@ kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/abcd1234-..."
 Drift happens when the cloud changes WITHOUT Terraform knowing.
 
 Examples of drift:
-- Someone added tags in AWS console
+- Someone added tags in Azure Portal
 - A resource was deleted manually
 - A security group rule changed
 - A load balancer got a new listener
@@ -155,38 +148,87 @@ And if something is deleted manually? Terraform sees: “Expected → found none
 
 ```
 terraform {
-  backend "s3" {
-    bucket         = "terraform-study-state"
-    key            = "labs/webserver/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "state-locks"
-    encrypt        = true
+  backend "azurerm" {
+    resource_group_name   = "tfstate-rg"
+    storage_account_name  = "tfstateaccount01"
+    container_name        = "tfstate"
+    key                   = "labs/webserver/terraform.tfstate"
   }
 }
 
-provider "aws" {
-  region = "us-east-1"
+
+provider "azurerm" {
+  features {}
 }
 
-resource "aws_instance" "web" {
-  ami           = "ami-0123456789abcdef0"  # Example AMI ID - use data source for real deployments
-  instance_type = "t2.micro"
-  tags = {
-    Name = "StateExample"
+
+resource "azurerm_resource_group" "main" {
+  name     = "example-rg"
+  location = "uksouth"
+}
+
+resource "azurerm_virtual_network" "main" {
+  name                = "example-vnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+}
+
+resource "azurerm_subnet" "main" {
+  name                 = "example-subnet"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_network_interface" "main" {
+  name                = "example-nic"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.main.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "web" {
+  name                = "example-webserver"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  size                = "Standard_B1s"
+  admin_username      = "azureuser"
+
+  network_interface_ids = [
+    azurerm_network_interface.main.id
+  ]
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
   }
 }
 
 output "web_ip" {
-  value = aws_instance.web.public_ip
+  value = azurerm_linux_virtual_machine.web.public_ip_address
 }
+
 
 ```
 ---
 
 ## 8. Key Takeaways
 - State = Terraform’s source of truth for infrastructure.
-- Remote state (S3 + DynamoDB) enables collaboration, durability, and locking.
-- Always secure state (encryption + IAM).
+- Storage account + container (locking built‑in via blob leases)
+- Always secure state (encryption + RBAC).
 - Never modify terraform.tfstate manually — use terraform state commands.
 - Think of the state file as Terraform’s equivalent of etcd in Kubernetes.
 
@@ -203,13 +245,13 @@ D) Store variable values
 
 <details>
 <summary>Show Answer</summary>
-Answer: **B** - Terraform state tracks the mapping between resources defined in code and actual infrastructure in the cloud, storing IDs, ARNs, and attributes needed for management.
+Answer: **B** - Terraform state tracks the mapping between resources defined in code and actual infrastructure in the cloud, storing IDs, and attributes needed for management.
 </details>
 
 ---
 
 ### Question 2
-What does DynamoDB provide in an S3 backend configuration?
+What does Blob Leases provide in an Storage Account backend configuration?
 A) Stores the state file
 B) Provides state locking to prevent concurrent modifications
 C) Encrypts the state file
@@ -217,7 +259,7 @@ D) Backs up the state file
 
 <details>
 <summary>Show Answer</summary>
-Answer: **B** - DynamoDB provides state locking, preventing multiple users or processes from modifying state simultaneously, which prevents corruption.
+Answer: **B** - Blob Leases provides state locking, preventing multiple users or processes from modifying state simultaneously, which prevents corruption.
 </details>
 
 ---
@@ -238,10 +280,10 @@ Answer: **B** - `terraform state mv` renames or moves resources within state wit
 
 ## 10. Lab Challenge
 Create a remote state backend using:
-1. S3 bucket (my-terraform-lab-state)
-2. DynamoDB table (terraform-lock-lab)
-3. A simple EC2 instance
-4. Verify remote state exists with aws s3 ls
+1. Storage Account Container (my-terraform-lab-state)
+2. Blob leases (terraform-lock-lab)
+3. A simple Virtual Machine
+4. Verify remote state exists by browsing to the container
 5. Try intentionally applying twice to test locking
 
 

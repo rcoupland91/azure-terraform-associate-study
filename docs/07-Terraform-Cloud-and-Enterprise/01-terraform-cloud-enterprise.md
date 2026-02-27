@@ -270,56 +270,59 @@ terraform {
 
 ### Common Policy Examples
 
-#### Policy 1: Restrict Instance Types
+#### Policy 1: Restrict VM Sizes
 
 ```python
 import "tfplan"
 
-allowed_types = ["t2.micro", "t3.micro", "t3.small"]
+allowed_sizes = ["Standard_B1s", "Standard_B2s", "Standard_D2s_v3"]
 
 main = rule {
   all tfplan.resource_changes as _, rc {
-    rc.type is not "aws_instance" or
-    rc.change.after.instance_type in allowed_types
+    rc.type is not "azurerm_linux_virtual_machine" or
+    rc.change.after.size in allowed_sizes
   }
 }
+
 ```
 
-**What it does:** Only allows specific EC2 instance types.
+**What it does:** Only allows specific VM Sizes.
 
 #### Policy 2: Require Tags
 
 ```python
 import "tfplan"
 
-required_tags = ["Environment", "Project", "ManagedBy"]
+required_tags = ["Environment", "Owner", "CostCenter"]
 
 main = rule {
   all tfplan.resource_changes as _, rc {
-    rc.type is "aws_instance" implies
+    rc.change.after.tags is undefined or
     all required_tags as tag {
       tag in rc.change.after.tags
     }
   }
 }
+
 ```
 
-**What it does:** Ensures all EC2 instances have required tags.
+**What it does:** Ensures all resources have required tags.
 
-#### Policy 3: Prevent Public S3 Buckets
+#### Policy 3: Block Public Storage Accounts
 
 ```python
 import "tfplan"
 
 main = rule {
   all tfplan.resource_changes as _, rc {
-    rc.type is not "aws_s3_bucket" or
-    rc.change.after.public_access_block_config[0].block_public_acls is true
+    rc.type is not "azurerm_storage_account" or
+    rc.change.after.allow_blob_public_access is false
   }
 }
+
 ```
 
-**What it does:** Prevents creation of publicly accessible S3 buckets.
+**What it does:** Prevents creation of publicly accessible Storage Accounts.
 
 ### When Policies Run
 
@@ -356,7 +359,7 @@ Allows organizations to:
 
 **Module structure:**
 ```
-terraform-aws-vpc/
+terraform-azure-vpc/
 ├── main.tf
 ├── variables.tf
 ├── outputs.tf
@@ -370,8 +373,8 @@ terraform-aws-vpc/
 ### Using Private Modules
 
 ```hcl
-module "vpc" {
-  source = "app.terraform.io/my-org/aws-vpc/aws"
+module "vnet" {
+  source = "app.terraform.io/my-org/azurerm-vnet/azure"
   version = "1.0.0"
   
   cidr_block = "10.0.0.0/16"
@@ -501,10 +504,10 @@ Answer: **C** - Sentinel is the Policy as Code framework that enforces policies 
 
 ### Question 3
 How do you reference a private module from HCP Terraform's registry?
-A) `source = "./modules/vpc"`
-B) `source = "app.terraform.io/org/vpc/aws"`
-C) `source = "hashicorp/vpc/aws"`
-D) `source = "git::https://github.com/org/vpc"`
+A) `source = "./modules/vnet"`
+B) `source = "app.terraform.io/org/vnet/azure"`
+C) `source = "hashicorp/vnet/azure"`
+D) `source = "git::https://github.com/org/vnet"`
 
 <details>
 <summary>Show Answer</summary>

@@ -26,29 +26,28 @@ A **provider** is a plugin that Terraform uses to interact with APIs of cloud pl
 ### Simple Provider Block
 
 ```hcl
-provider "aws" {
-  region = "us-east-1"
+provider "azurerm" {
+  features {}
 }
+
 ```
 
 **Key points:**
-- Provider name: `aws`
-- Configuration: `region = "us-east-1"`
+- Provider name: `azurerm`
 - Applies to all resources using this provider (unless overridden)
 
-### Common AWS Provider Arguments
+### Common Azure Provider Arguments
 
 ```hcl
-provider "aws" {
-  region                  = "us-east-1"
-  shared_credentials_files = ["~/.aws/credentials"]
-  profile                  = "default"
-  access_key               = "AKIA..."        # Not recommended
-  secret_key               = "secret..."       # Not recommended
+provider "azurerm" {
+  resource_provider_registrations = "none"  # Azure has many resource providers (e.g., Microsoft.Compute, Microsoft.Network). By default, the AzureRM provider may try to automatically register any missing providers when you deploy resources. Setting this to "none" disables that behavior.
+  alias                           = "test"  # This gives the provider configuration a name so you can reference it explicitly.
+  subscription_id                 = {subID} # This tells Terraform which Azure subscription to use for this provider instance.
+  features {}                               # This block is required even if empty.  It enables provider‑specific features and settings.
 }
 ```
 
-**Best Practice:** Use AWS credentials from environment variables or AWS CLI config, not hardcoded in Terraform files.
+**Best Practice:** Use Managed Identity/Entra ID Workload Identity Federation or Azure CLI authentication, not hardcoded in Terraform files.
 
 ---
 
@@ -67,18 +66,15 @@ Providers are constantly updated. Version constraints ensure:
 
 ```hcl
 terraform {
-  required_version = ">= 1.0"
-  
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+    azurerm = {
+      source                = "hashicorp/azurerm"
+      version               = "~> 4.57.0"
+      configuration_aliases = [azurerm.test]
     }
   }
-}
-
-provider "aws" {
-  region = "us-east-1"
+  backend "azurerm" {
+  }
 }
 ```
 
@@ -106,22 +102,22 @@ version = "~> 5.25"   # Allows 5.25.0, 5.25.1, but NOT 5.26.0 or 6.0.0
 
 ```hcl
 terraform {
-  required_version = ">= 1.12"
-  
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+    azurerm = {
+      source                = "hashicorp/azurerm"
+      version               = "~> 4.49.0"
+      configuration_aliases = [azurerm.test]
     }
-    null = {
-      source  = "hashicorp/null"
-      version = "~> 3.0"
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.7.0"
     }
-    local = {
-      source  = "hashicorp/local"
-      version = "~> 2.0"
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.13.1"
     }
   }
+
 }
 ```
 
@@ -136,8 +132,7 @@ terraform {
 ```
 
 **Common patterns:**
-- `hashicorp/aws` - Official HashiCorp AWS provider
-- `terraform-aws-modules/aws` - Community module (NOT a provider)
+- `hashicorp/azurerm` - Official HashiCorp Azure provider
 - `custom-org/custom-provider` - Custom provider
 
 ### Default Registry Providers
@@ -146,9 +141,9 @@ For providers in the Terraform Registry, you can omit the full source:
 
 ```hcl
 required_providers {
-  aws = {
+  azurerm = {
     version = "~> 5.0"
-    # source defaults to registry.terraform.io/hashicorp/aws
+    # source defaults to registry.terraform.io/hashicorp/azurerm
   }
 }
 ```
@@ -157,9 +152,9 @@ required_providers {
 
 ```hcl
 required_providers {
-  aws = {
-    source  = "registry.terraform.io/hashicorp/aws"
-    version = "~> 5.0"
+  azurerm = {
+    source  = "hashicorp/azurerm"
+    version = "~> 4.49.0"
   }
 }
 ```
@@ -188,66 +183,89 @@ Use aliases when you need:
 ### Basic Alias Example
 
 ```hcl
-# Default AWS provider (us-east-1)
-provider "aws" {
-  region = "us-east-1"
+# Default Azure provider (e.g., test subscription)
+provider "azurerm" {
+  features {}
+  subscription_id = var.test_subscription_id
 }
 
-# Alias for us-west-2
-provider "aws" {
-  alias  = "west"
-  region = "us-west-2"
+# Aliased provider for a second subscription (e.g., ukwest)
+provider "azurerm" {
+  alias           = "secondary"
+  features        = {}
+  subscription_id = var.secondary_subscription_id
 }
+
 
 # Use default provider
-resource "aws_s3_bucket" "east" {
-  bucket = "my-bucket-east"
-  # Uses default provider (us-east-1)
+resource "azurerm_resource_group" "core_rg" {
+  name     = "rg-core"
+  location = "uksouth"
+  # Uses default provider (core subscription)
 }
 
+
 # Use aliased provider
-resource "aws_s3_bucket" "west" {
-  provider = aws.west
-  
-  bucket = "my-bucket-west"
-  # Uses aliased provider (us-west-2)
+resource "azurerm_resource_group" "secondary_rg" {
+  provider = azurerm.secondary
+
+  name     = "rg-secondary"
+  location = "ukwest"
+  # Uses the aliased provider (secondary subscription)
 }
+
 ```
 
 ### Multiple Provider Instances
 
 ```hcl
 # Main account
-provider "aws" {
-  region = "us-east-1"
-  # Uses default profile
+# Default Azure provider (main subscription)
+provider "azurerm" {
+  features {}
+  subscription_id = var.main_subscription_id
+  tenant_id       = var.tenant_id
 }
 
-# Different AWS account
-provider "aws" {
-  alias   = "dev_account"
-  region  = "us-east-1"
-  profile = "dev-account-profile"
+# Different Azure subscription
+provider "azurerm" {
+  alias           = "dev_sub"
+  features        = {}
+  subscription_id = var.dev_subscription_id
+  tenant_id       = var.tenant_id
 }
 
-# Different region, same account
-provider "aws" {
-  alias  = "eu_region"
-  region = "eu-west-1"
+# Same subscription, different region
+provider "azurerm" {
+  alias           = "eu_region"
+  features        = {}
+  subscription_id = var.main_subscription_id
+  tenant_id       = var.tenant_id
 }
 
-resource "aws_instance" "main" {
-  # Uses default provider
+
+resource "azurerm_resource_group" "main" {
+  name     = "rg-main"
+  location = "uksouth"
+  # Uses default provider (main subscription)
 }
 
-resource "aws_instance" "dev" {
-  provider = aws.dev_account
-  # Uses dev account
+
+resource "azurerm_resource_group" "dev" {
+  provider = azurerm.dev_sub
+
+  name     = "rg-dev"
+  location = "uksouth"
+  # Uses dev subscription
 }
 
-resource "aws_s3_bucket" "europe" {
-  provider = aws.eu_region
-  # Uses EU region
+
+resource "azurerm_resource_group" "europe" {
+  provider = azurerm.eu_region
+
+  name     = "rg-europe"
+  location = "westeurope"
+  # Uses main subscription but deploys in EU region
 }
 ```
 
@@ -255,38 +273,40 @@ resource "aws_s3_bucket" "europe" {
 
 **Root module:**
 ```hcl
-provider "aws" {
-  region = "us-east-1"
+# Default Azure provider
+provider "azurerm" {
+  features {}
+  subscription_id = var.main_subscription_id
 }
 
-provider "aws" {
-  alias  = "west"
-  region = "us-west-2"
+# Aliased provider for another subscription
+provider "azurerm" {
+  alias           = "dev_sub"
+  features        = {}
+  subscription_id = var.dev_subscription_id
 }
 
-module "vpc_east" {
-  source = "./modules/vpc"
-  # Uses default provider
+# Aliased provider for same subscription but different region (optional)
+provider "azurerm" {
+  alias           = "eu_region"
+  features        = {}
+  subscription_id = var.main_subscription_id
 }
 
-module "vpc_west" {
-  source = "./modules/vpc"
-  
-  providers = {
-    aws = aws.west
-  }
-}
 ```
 
-**Child module (`modules/vpc/main.tf`):**
+**Child module (`modules/vnet/main.tf`):**
 ```hcl
-provider "aws" {
-  # Configuration can be omitted if passed from root
+# Declare the provider so the module can accept one from the root
+provider "azurerm" {}
+
+resource "azurerm_virtual_network" "main" {
+  name                = "vnet-main"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  address_space       = ["10.0.0.0/16"]
 }
 
-resource "aws_vpc" "main" {
-  # Uses the provider passed from root
-}
 ```
 
 ---
@@ -295,11 +315,11 @@ resource "aws_vpc" "main" {
 
 When the same provider is configured multiple times, Terraform uses this order (highest → lowest):
 
-1. **Provider argument in resource block** (`provider = aws.west`)
-2. **Provider alias in module block** (`providers = { aws = aws.west }`)
+1. **Provider argument in resource block** (`provider = azurerm.dev_sub`)
+2. **Provider alias in module block** (`providers = {azurerm = azurerm.dev_sub}`)
 3. **Default provider configuration** (non-aliased provider)
-4. **Environment variables** (e.g., `AWS_REGION`)
-5. **AWS CLI configuration** (`~/.aws/config`)
+4. **Environment variables** (e.g., `ARM_SUBSCRIPTION_ID`)
+5. **Azure CLI authentication** (`az login`)
 
 ---
 
@@ -310,31 +330,33 @@ When the same provider is configured multiple times, Terraform uses this order (
 If you don't specify a provider, Terraform uses the **default (non-aliased) provider**:
 
 ```hcl
-provider "aws" {
-  region = "us-east-1"
+provider "azurerm" {
+  subscription_id = var.main_subscription_id
+  features {}
 }
 
 # This resource uses the default provider above
-resource "aws_instance" "web" {
-  ami           = "ami-123"
-  instance_type = "t2.micro"
+resource "azurerm_key_vault" "kv" {
+  name           = "kv-test"
+  resource_group_name = "kv-rg"
 }
 ```
 
 ### Explicit Provider Reference
 
 ```hcl
-provider "aws" {
-  alias  = "west"
-  region = "us-west-2"
+provider "azurerm" {
+  subscription_id = var.main_subscription_id
+  features {}
+  alias = "uksouth"
 }
 
 # Explicitly use aliased provider
-resource "aws_instance" "web" {
-  provider = aws.west
+resource "azurerm_key_vault" "kv" {
+  provider = azurerm.uksouth
   
-  ami           = "ami-123"
-  instance_type = "t2.micro"
+  name           = "kv-test"
+  resource_group_name = "kv-rg"
 }
 ```
 
@@ -346,32 +368,33 @@ resource "aws_instance" "web" {
 
 **Parent module:**
 ```hcl
-provider "aws" {
-  region = "us-east-1"
+provider "azurerm" {
+  subscription_id = var.main_subscription_id
+  features {}
 }
 
-provider "aws" {
+provider "azurerm" {
   alias  = "west"
-  region = "us-west-2"
+  subscription_id = var.west_subscription_id
 }
 
 module "multi_region" {
   source = "./modules/vpc"
   
   providers = {
-    aws         = aws          # Pass default provider
-    aws.west    = aws.west     # Pass aliased provider
+    azurerm         = azurerm          # Pass default provider
+    azurerm.west    = azurerm.west     # Pass aliased provider
   }
 }
 ```
 
-**Child module (`modules/vpc/main.tf`):**
+**Child module (`modules/vnet/main.tf`):**
 ```hcl
 terraform {
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.49.0"
     }
   }
 }
@@ -379,10 +402,10 @@ terraform {
 # Configuration Requirements block (Terraform 0.13+)
 terraform {
   required_providers {
-    aws = {
-      source                = "hashicorp/aws"
+    azurerm = {
+      source                = "hashicorp/azurerm"
       version               = "~> 5.0"
-      configuration_aliases = [aws.west]  # Declare required alias
+      configuration_aliases = [azurerm.west]  # Declare required alias
     }
   }
 }
@@ -398,25 +421,23 @@ terraform {
    ```hcl
    terraform {
      required_providers {
-       aws = {
-         source  = "hashicorp/aws"
-         version = "~> 5.0"
+       azurerm = {
+         source  = "hashicorp/azurerm"
+         version = "~> 4.49.0"
        }
      }
    }
    ```
 
 2. **Use version constraints:**
-   - `~> 5.0` for patch/minor updates
+   - `~> 4.49.0 for patch/minor updates
    - Pin exact version in production if needed
 
 3. **Store credentials securely:**
-   - Use AWS CLI config or environment variables
    - Never commit credentials to version control
 
 4. **Use aliases for multiple configurations:**
-   - Different regions
-   - Different accounts
+   - Different subscriptions
    - Different authentication methods
 
 ### ❌ Don'ts
@@ -424,9 +445,10 @@ terraform {
 1. **Don't hardcode credentials:**
    ```hcl
    # ❌ BAD
-   provider "aws" {
-     access_key = "AKIA..."
-     secret_key = "secret..."
+   provider "azurerm" {
+  client_id     = "5b432b33-a8c6-4c34-99a1-26916d4c65b6"
+  client_secret = "secret"
+  tenant_id     = "185562ad-39bc-4840-8e40-be6216340c52"
    }
    ```
 
@@ -460,14 +482,14 @@ Answer: **B** - `~>` (pessimistic constraint) allows >= 5.0.0 and < 6.0.0, so it
 
 ### Question 2
 How do you use a provider alias in a resource?
-A) `alias = aws.west`
-B) `provider = aws.west`
-C) `use_provider = aws.west`
-D) `provider_alias = aws.west`
+A) `alias = azurerm.west`
+B) `provider = azurerm.west`
+C) `use_provider = azurerm.west`
+D) `provider_alias = azurerm.west`
 
 <details>
 <summary>Show Answer</summary>
-Answer: **B** - Use `provider = aws.west` to reference an aliased provider in a resource block.
+Answer: **B** - Use `provider = azurerm.west` to reference an aliased provider in a resource block.
 </details>
 
 ---
@@ -487,29 +509,29 @@ Answer: **B** - `required_providers` must be inside a `terraform` block, typical
 ---
 
 ### Question 4
-What is the default provider source for `hashicorp/aws`?
-A) `hashicorp/aws`
-B) `registry.terraform.io/hashicorp/aws`
-C) `terraform.io/hashicorp/aws`
+What is the default provider source for `hashicorp/azurerm`?
+A) `hashicorp/azurerm`
+B) `registry.terraform.io/hashicorp/azurerm`
+C) `terraform.io/hashicorp/azurerm`
 D) No default, must specify
 
 <details>
 <summary>Show Answer</summary>
-Answer: **B** - The full source is `registry.terraform.io/hashicorp/aws`, but you can omit the full path for registry providers and just use `hashicorp/aws`.
+Answer: **B** - The full source is `registry.terraform.io/hashicorp/azurerm`, but you can omit the full path for registry providers and just use `hashicorp/azurerm`.
 </details>
 
 ---
 
 ### Question 5
-You need to create resources in multiple AWS regions. What's the best approach?
-A) Multiple provider blocks with different region values
+You need to create resources in multiple Azure subscriptions. What's the best approach?
+A) Multiple provider blocks with different subscription values
 B) Provider aliases
-C) Use the same provider and change region in each resource
+C) Use the same provider and change subscription in each resource
 D) Create separate Terraform configurations
 
 <details>
 <summary>Show Answer</summary>
-Answer: **B** - Use provider aliases to define multiple provider instances (e.g., `aws.us_east`, `aws.us_west`) and reference them with `provider = aws.us_west` in resources.
+Answer: **B** - Use provider aliases to define multiple provider instances (e.g., `azurerm.uksouth`, `azurerm.ukwest`) and reference them with `provider = azurerm.ukwest` in resources.
 </details>
 
 ---
@@ -521,29 +543,30 @@ Answer: **B** - Use provider aliases to define multiple provider instances (e.g.
 ```hcl
 terraform {
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
+    azurerm = {
+      source  = "hashicorp/azurerm"
       version = "~> 5.0"
     }
   }
 }
 
-provider "aws" {
-  region = "us-east-1"
+provider "azurerm" {
+  subscription_id = var.main_subscription_id
+  features {}
 }
 
-provider "aws" {
+provider "azurerm" {
   alias  = "west"
-  region = "us-west-2"
+  region = var.west_subscription_id
 }
 
-resource "aws_s3_bucket" "primary" {
-  bucket = "primary-bucket"
+resource "azurerm_key_vault" "primary" {
+  name = "primary-kv"
 }
 
-resource "aws_s3_bucket" "backup" {
-  provider = aws.west
-  bucket   = "backup-bucket"
+resource "azurerm_key_vault" "backup" {
+  provider = azurerm.west
+  bucket   = "backup-kv"
 }
 ```
 
@@ -554,8 +577,8 @@ terraform {
   required_version = ">= 1.12"
   
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
+    azurerm = {
+      source  = "hashicorp/azurerm"
       version = "5.25.0"  # Exact version for stability
     }
   }
@@ -567,8 +590,8 @@ terraform {
 ```hcl
 terraform {
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
+    azurerm = {
+      source  = "hashicorp/azurerm"
       version = ">= 4.0, < 6.0"  # Allow 4.x and 5.x
     }
   }
@@ -582,10 +605,10 @@ terraform {
 - **`required_providers`**: Declares provider requirements in a `terraform` block.
 - **Version constraints**: Use `~>` for pessimistic constraints (allows patch/minor, not major).
 - **Provider aliases**: Use `alias` to create multiple provider instances for different configs.
-- **Provider reference**: Use `provider = aws.alias_name` in resources to use aliased providers.
+- **Provider reference**: Use `provider = azurerm.alias_name` in resources to use aliased providers.
 - **Source format**: `registry.terraform.io/namespace/provider-name` (can omit registry for official providers).
-- **Never hardcode credentials**: Use environment variables or AWS CLI configuration.
-- **Module providers**: Pass providers to modules using `providers = { aws = aws.west }` block.
+- **Never hardcode credentials**: Use environment variables or Azure CLI configuration.
+- **Module providers**: Pass providers to modules using `providers = { azurerm = azurerm.west }` block.
 
 ---
 

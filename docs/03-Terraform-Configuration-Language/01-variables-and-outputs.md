@@ -23,19 +23,21 @@ Variables allow Terraform to behave like a *parameterized template*, making it e
 Variables are typically defined in a file named `variables.tf`:
 
 ```hcl
-variable "instance_type" {
-  description = "EC2 instance size"
+variable "account_tier" {
   type        = string
-  default     = "t2.micro"
+  default     = "Standard"
 }
 ```
 
 You reference a variable in code with the prefix var.:
 
 ```
-resource "aws_instance" "web" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
+resource "azurerm_storage_account" "data" {
+  name                     = "test-sa"
+  resource_group_name      = "test-rg"
+  location                 = "westeurope"
+  account_tier             = var.account_tier
+  account_replication_type = "LRS"
 }
 ```
 
@@ -49,14 +51,14 @@ Terraform supports multiple data types.
 
 | Type             | Example                                    | Description                |
 | ---------------- | ------------------------------------------ | -------------------------- |
-| **string**       | `"t2.micro"`                               | Text value                 |
+| **string**       | `"Standard"`                               | Text value                 |
 | **number**       | `3`                                        | Integer or float           |
 | **bool**         | `true`                                     | Boolean value              |
 | **list(string)** | `["dev", "test", "prod"]`                  | Ordered list of strings    |
-| **map(string)**  | `{ region = "us-east-1", env = "dev" }`    | Key/value pairs            |
+| **map(string)**  | `{ region = "uksouth", env = "dev" }`      | Key/value pairs            |
 | **object**       | `object({ name = string, size = number })` | Complex structure          |
-| **tuple**        | `[true, "t2.micro", 2]`                    | Fixed collection of values |
-| **set(string)**  | `set(["t2.micro", "t2.nano"])`             | Unique, unordered values   |
+| **tuple**        | `[true, "Standard", 2]`                    | Fixed collection of values |
+| **set(string)**  | `set(["Standard", "Premium"])`             | Unique, unordered values   |
 
 ---
 
@@ -66,12 +68,12 @@ If the same variable is defined in multiple places, the following precedence ord
 
 | Source                           | Example                                   | Priority   |
 | -------------------------------- | ----------------------------------------- | ---------- |
-| CLI flags                        | `terraform apply -var="region=us-west-1"` | 🥇 Highest |
+| CLI flags                        | `terraform apply -var="region=uksouth"`   | 🥇 Highest |
 | `.tfvars` file passed explicitly | `terraform apply -var-file=prod.tfvars`   |            |
-| Environment variables            | `export TF_VAR_region=us-east-1`          |            |
+| Environment variables            | `export TF_VAR_region=uksouth`            |            |
 | Auto-loaded files                | `*.auto.tfvars`                           |            |
 | `terraform.tfvars`               | Auto-loaded default file                  |            |
-| Variable default in code         | `default = "us-east-1"`                   | 🥉 Lowest  |
+| Variable default in code         | `default = "uksouth"`                     | 🥉 Lowest  |
 
 Example question (exam-style):
 
@@ -97,7 +99,7 @@ Outputs:
 
 db_password = (sensitive value)
 ```
-For true secrecy, store them securely (AWS Secrets Manager, Vault, etc.) and retrieve with data sources.
+For true secrecy, store them securely (Azure Key Vault, Devops Variable groups, etc.) and retrieve with data sources.
 
 ---
 
@@ -106,8 +108,8 @@ Instead of defining values interactively, use a .tfvars file.
 
 terraform.tfvars:
 ```
-region         = "us-east-1"
-instance_type  = "t3.micro"
+region         = "uksouth"
+account_tier   = "Standard"
 environment    = "dev"
 ```
 Then apply: 
@@ -124,20 +126,20 @@ This keeps configurations clean and environment-specific.
 ## 7. Outputs
 Outputs expose information after Terraform creates resources — for example, the public IP of an instance or the ARN of a resource.
 ```
-output "instance_ip" {
-  description = "Public IP of the EC2 instance"
-  value       = aws_instance.web.public_ip
+output "virtual_machine_ip" {
+  description = "IP of the Virtual Machine"
+  value       = azurerm_linux_virtual_machine.web.private_ip_address
 }
 ```
 Run: 
 ```
 terraform output
-terraform output instance_ip
+terraform output virtual_machine_ip
 ```
 Marking Outputs as Sensitive
 ```
 output "db_password" {
-  value     = aws_db_instance.main.password
+  value     = azurerm_mssql_managed_instance.main.password
   sensitive = true
 }
 ```
@@ -149,23 +151,32 @@ This hides it in CLI output but still stores it in state.
 
 Outputs are also how modules pass data between each other.
 
-Child module (vpc/main.tf):
+Child module vnet/outputs.tf:
 ```
-output "vpc_id" {
-  value = aws_vpc.main.id
+output "subnet_id" {
+  value = azurerm_subnet.private.id
 }
 ```
-Root Module: 
+Root Module (main.tf) :
 ```
-module "vpc" {
-  source = "./vpc"
+module "vnet" {
+  source = "./vnet"
 }
 
-resource "aws_instance" "web" {
-  ami           = var.ami
-  instance_type = var.instance_type
-  subnet_id     = module.vpc.vpc_id
+resource "azurerm_private_endpoint" "example" {
+  name                = "my-pep"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  subnet_id           = module.vnet.subnet_id
+
+  private_service_connection {
+    name                           = "myConnection"
+    private_connection_resource_id = azurerm_storage_account.example.id
+    subresource_names              = ["blob"]
+    is_manual_connection           = false
+  }
 }
+
 ```
 
 ---
@@ -173,41 +184,36 @@ resource "aws_instance" "web" {
 ## 9. Practical Example 
 variables.tf
 ```
-variable "instance_type" {
+variable "account_tier" {
   type        = string
-  default     = "t2.micro"
-}
-
-variable "ami" {
-  type        = string
-  description = "Amazon Machine Image ID"
+  default     = "Standard"
 }
 ```
 main.tf
 ```
-provider "aws" {
-  region = "us-east-1"
+provider "azurerm" {
+  region = "uksouth"
 }
 
-resource "aws_instance" "web" {
-  ami           = var.ami
-  instance_type = var.instance_type
-  tags = {
-    Name = "VariableExample"
-  }
+resource "azurerm_storage_account" "data" {
+  name                     = "test-sa"
+  resource_group_name      = "test-rg"
+  location                 = "uksouth"
+  account_tier             = var.account_tier
+  account_replication_type = "LRS"
 }
 
-output "public_ip" {
-  value       = aws_instance.web.public_ip
-  description = "EC2 public IP address"
+output "storage_account_id" {
+  value       = azurerm_storage_account.web.id
+  description = "Storage Accounts ID"
 }
 ```
 Run: 
 ```bash
-terraform apply -var="ami=ami-0123456789abcdef0"
+terraform apply -var="account_tier=Standard"
 ```
 
-**Note:** AMI IDs in examples are placeholders. In real deployments, use `data "aws_ami"` data sources to fetch the latest AMI IDs.
+**Note:** Resource IDs in examples are placeholders. In real deployments, use ` data sources to fetch the latest Resource IDs.
 ---
 
 ## 10. Best Practices
@@ -217,7 +223,7 @@ terraform apply -var="ami=ami-0123456789abcdef0"
 | Group variables logically in `variables.tf`       | Improves readability                                |
 | Use clear names and descriptions                  | Easier for teams to maintain                        |
 | Use `.tfvars` files for environment-specific data | Keeps configs clean                                 |
-| Never store secrets in plain `.tfvars` or code    | Use AWS Secrets Manager, Vault, or environment vars |
+| Never store secrets in plain `.tfvars` or code    | Use Azure Key Vaults, Devops Variables, etc         |
 | Use outputs sparingly                             | Only expose what's necessary                        |
 | Combine outputs with `sensitive = true`           | Hide confidential info                              |
 

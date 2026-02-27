@@ -1,0 +1,15 @@
+site_name: My Code Library
+theme:
+  name: material
+  palette: 
+    scheme: slate # Dark mode is usually better for code
+  features:
+    - content.code.copy
+    - navigation.expand
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true

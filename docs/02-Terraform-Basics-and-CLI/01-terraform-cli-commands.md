@@ -42,12 +42,12 @@ terraform init -migrate-state    # Migrate state to new backend
 **Common flags:**
 ```bash
 terraform plan                                    # Standard plan
-terraform plan -out=tfplan                       # Save plan to file
-terraform plan -var="instance_type=t3.large"     # Set variable
-terraform plan -var-file=prod.tfvars             # Use variable file
-terraform plan -target=aws_instance.web          # Plan specific resource only
-terraform plan -refresh=false                    # Skip state refresh
-terraform plan -refresh-only                     # Only refresh state, don't plan changes
+terraform plan -out=tfplan                        # Save plan to file
+terraform plan -var="location=uksouth"            # Set variable
+terraform plan -var-file=prod.tfvars              # Use variable file
+terraform plan -target=azure_vm.web               # Plan specific resource only
+terraform plan -refresh=false                     # Skip state refresh
+terraform plan -refresh-only                      # Only refresh state, don't plan changes
 ```
 
 **Key differences:**
@@ -63,12 +63,12 @@ terraform plan -refresh-only                     # Only refresh state, don't pla
 
 **Common flags:**
 ```bash
-terraform apply                           # Interactive (prompts for approval)
-terraform apply -auto-approve             # Skip confirmation prompt
-terraform apply tfplan                    # Apply saved plan file
-terraform apply -target=aws_instance.web  # Apply to specific resource
-terraform apply -refresh=false            # Use cached state
-terraform apply -var="key=value"         # Pass variable
+terraform apply                             # Interactive (prompts for approval)
+terraform apply -auto-approve               # Skip confirmation prompt
+terraform apply tfplan                      # Apply saved plan file
+terraform apply -target=azure_vm.web        # Apply to specific resource
+terraform apply -refresh=false              # Use cached state
+terraform apply -var="key=value"            # Pass variable
 ```
 
 **Exam tip:** `terraform apply -auto-approve` is useful in CI/CD pipelines.
@@ -82,7 +82,7 @@ terraform apply -var="key=value"         # Pass variable
 ```bash
 terraform destroy                          # Interactive destruction
 terraform destroy -auto-approve            # Skip confirmation
-terraform destroy -target=aws_instance.web # Destroy specific resource
+terraform destroy -target=azure_vm.web     # Destroy specific resource
 ```
 
 ---
@@ -110,15 +110,18 @@ terraform fmt -diff        # Show what would change
 **Example:**
 ```bash
 # Before formatting (inconsistent spacing)
-resource "aws_instance" "web"{
-ami = "ami-123"
-instance_type="t2.micro"
+resource "azurerm_key_vault" "example" {
+name                        = "examplekeyvault"
+location                    = var.location
+resource_group_name         = "testresourcegroup"
+  tenant_id                   = "29334838934093843894328" #test tenant ID
 }
-
 # After terraform fmt
-resource "aws_instance" "web" {
-  ami           = "ami-123"
-  instance_type = "t2.micro"
+resource "azurerm_key_vault" "example" {
+  name                        = "examplekeyvault"
+  location                    = var.location
+  resource_group_name         = "testresourcegroup"
+  tenant_id                   = "29334838934093843894328" #test tenant ID
 }
 ```
 
@@ -152,7 +155,7 @@ terraform validate
 # Or if there's an error:
 Error: Reference to undeclared input variable
   on main.tf line 5:
-   5: instance_type = var.invalid_var
+   5: location = var.invalid_var
 ```
 
 **Exam tip:** Always run `terraform validate` before committing code. It's faster than `plan` and catches config errors early.
@@ -172,7 +175,8 @@ Error: Reference to undeclared input variable
 terraform version
 Terraform v1.12.0
 on windows_amd64
-+ provider registry.terraform.io/hashicorp/aws v5.25.0
++ provider registry.terraform.io/hashicorp/azuread v3.8.0
++ provider registry.terraform.io/hashicorp/azurerm v4.21.1
 ```
 
 **Common flags:**
@@ -197,14 +201,14 @@ terraform version -json  # JSON output
 **Example:**
 ```bash
 $ terraform console
-> var.instance_type
-t2.micro
+> var.aks_assigned_principle_identity
+false
 > upper("hello")
 HELLO
 > length(["a", "b", "c"])
 3
-> var.ami != null ? var.ami : "ami-default"
-ami-default
+> var.aks_assigned_principle_identity != null ? var.aks_assigned_principle_identity : "true"
+false
 > exit
 ```
 
@@ -266,9 +270,9 @@ $ terraform output -raw instance_ip
 **Example:**
 ```bash
 terraform state list
-aws_instance.web
-aws_s3_bucket.data
-module.vpc.aws_vpc.main
+azurerm_role_assignment.storage_blob_data_owner
+azurerm_service_plan.function_app
+azurerm_storage_account.example
 ```
 
 ---
@@ -278,14 +282,16 @@ module.vpc.aws_vpc.main
 
 **Example:**
 ```bash
-terraform state show aws_instance.web
-# aws_instance.web:
-resource "aws_instance" "web" {
-    ami                          = "ami-0123456789abcdef0"  # Example AMI ID
-    arn                          = "arn:aws:ec2:us-east-1:..."
-    instance_type                = "t2.micro"
-    public_ip                    = "3.94.72.21"
-    ...
+terraform state show 'azurerm_resource_group.rg[\"test\"]' # When using powershell and having multiple resources, you need to ensure quotations and backslashes are used as PowerShell will be interpreting the quotes and brackets, not Terraform itself.
+# azurerm_resource_group["test]:
+resource "azurerm_resource_group" "rg" {
+    id         = "/subscriptions/{subID}/resourceGroups/test-rg"
+    location   = "uksouth"
+    managed_by = null
+    name       = "test-rg"
+    tags       = {
+        "Terraform"   = "True"
+    }
 }
 ```
 
@@ -301,8 +307,9 @@ resource "aws_instance" "web" {
 
 **Example:**
 ```bash
-terraform state mv aws_instance.old aws_instance.new
-terraform state mv aws_instance.web module.web.aws_instance.web
+terraform state mv azure_vm.old azure_vm.new
+terraform state mv module.testapp_vm module.testapp_vm[0]
+terraform state mv module.testapp_vm module.testapp_vm["run"]
 ```
 
 **Exam tip:** This does NOT modify actual infrastructure, only the state file.
@@ -319,10 +326,11 @@ terraform state mv aws_instance.web module.web.aws_instance.web
 
 **Example:**
 ```bash
-terraform state rm aws_instance.old
+terraform state rm azurerm_linux_virtual_machine.old
+terraform state rm azurerm_app_service_plan.alert_function
 ```
 
-**Warning:** Resource still exists in AWS. Terraform will no longer manage it.
+**Warning:** Resource still exists in Azure. Terraform will no longer manage it.
 
 ---
 

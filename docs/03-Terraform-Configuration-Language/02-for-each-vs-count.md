@@ -23,13 +23,29 @@ Both serve similar purposes but have different use cases and behaviors.
 ### Basic Syntax
 
 ```hcl
-resource "aws_instance" "web" {
-  count = 3
-  
-  ami           = "ami-0123456789abcdef0"  # Example AMI ID
-  instance_type = "t2.micro"
-  tags = {
-    Name = "web-server-${count.index}"
+resource "azurerm_linux_virtual_machine" "web" {
+  count               = 2
+  name                = "myvm-${count.index}"
+  resource_group_name = "test-rg"
+  location            = "uksouth"
+  size                = "Standard_B1s"
+
+  admin_username      = "azureuser"
+
+  network_interface_ids = [
+    "/subscriptions/{subID}/resourceGroups/test-rg/providers/Microsoft.Network/networkInterfaces/myvm-${count.index}-nic"
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
   }
 }
 ```
@@ -37,24 +53,36 @@ resource "aws_instance" "web" {
 **What it does:**
 - Creates 3 identical EC2 instances
 - `count.index` provides 0, 1, 2 for each instance
-- Resource address: `aws_instance.web[0]`, `aws_instance.web[1]`, `aws_instance.web[2]`
+- Resource address: `azurerm_linux_virtual_machine.web[0]`, `azurerm_linux_virtual_machine.web[1]`, `azurerm_linux_virtual_machine.web[2]`
 
 ### Referencing Resources Created with `count`
 
 ```hcl
 # Output all instance IDs
 output "instance_ids" {
-  value = aws_instance.web[*].id
+  value = azurerm_linux_virtual_machine.web[*].id
 }
 
 # Output specific instance
 output "first_instance_id" {
-  value = aws_instance.web[0].id
+  value = azurerm_linux_virtual_machine.web[0].id
 }
 
 # Reference in another resource
-resource "aws_elb" "web" {
-  instances = aws_instance.web[*].id
+resource "azurerm_network_interface" "vmnic" {
+  count               = 2
+  name                = "vmnic-${count.index}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.app.id
+    private_ip_address_allocation = "Dynamic"
+    load_balancer_backend_address_pools_ids = [
+      azurerm_lb_backend_address_pool.example.id
+    ]
+  }
 }
 ```
 
@@ -76,48 +104,31 @@ resource "aws_elb" "web" {
 
 ### Basic Syntax (with Map)
 
+```bash
+storage_accounts = [
+  { name = "sa-01" },
+  { name = "sa-02" }
+]
+```
+
 ```hcl
-resource "aws_instance" "web" {
-  for_each = {
-    web-1 = "t2.micro"
-    web-2 = "t3.small"
-    web-3 = "t2.micro"
-  }
-  
-  ami           = "ami-0123456789abcdef0"  # Example AMI ID
-  instance_type = each.value
-  tags = {
-    Name = each.key
-  }
+resource "azurerm_storage_account" "example" {
+  for_each = { for account in var.storage_accounts : account.name => account if var.environment != "dr" }
+
+  name                     = each.value.name
+  resource_group_name      = azurerm_resource_group.rg[each.value.name].name
+  location                 = var.location
+  account_tier             = try(each.value.account_tier, "Standard")
+  account_kind             = try(each.value.account_kind, "StorageV2")
+  account_replication_type = try(each.value.account_replication_type, "LRS")
 }
 ```
 
 **What it does:**
-- Creates 3 instances with unique keys: `web-1`, `web-2`, `web-3`
-- `each.key` = the map key (e.g., "web-1")
-- `each.value` = the map value (e.g., "t2.micro")
-- Resource address: `aws_instance.web["web-1"]`, `aws_instance.web["web-2"]`, etc.
-
-### Basic Syntax (with Set)
-
-```hcl
-variable "regions" {
-  type    = set(string)
-  default = ["us-east-1", "us-west-2", "eu-west-1"]
-}
-
-resource "aws_s3_bucket" "logs" {
-  for_each = var.regions
-  
-  bucket = "logs-${each.value}"
-  
-  provider = aws.region[each.value]
-}
-```
-
-**With sets:**
-- `each.key` = the set element value
-- `each.value` = same as `each.key` (for sets)
+- Creates 3 instances with unique keys: `sa-01`, `sa-02`
+- `each.key = the key values as per "account.name" (sa-01)
+- `each.value` = the map value (e.g., "sa-01")
+- Resource address: `azurerm_storage_account.example["sa-01"]`, `azurerm_storage_account.example["sa-02"]`, etc.
 
 ### Referencing Resources Created with `for_each`
 
@@ -125,18 +136,18 @@ resource "aws_s3_bucket" "logs" {
 # Output all instance IDs as map
 output "instance_ids" {
   value = {
-    for k, instance in aws_instance.web : k => instance.id
+    for k, instance in azurerm_storage_account.example : k => instance.id
   }
 }
 
 # Output specific instance
-output "web_1_id" {
-  value = aws_instance.web["web-1"].id
+output "storage_account_output" {
+  value = azurerm_storage_account.example["sa-01"].id
 }
 
 # Reference in another resource
-resource "aws_elb" "web" {
-  instances = values(aws_instance.web)[*].id
+resource "azurerm_storage_account_network_rules" "sa_fw_rules" {
+   storage_account_id = values(azurerm_storage_account.example)[*].id
 }
 ```
 
@@ -175,20 +186,36 @@ resource "aws_elb" "web" {
 
 **Using `count`:**
 ```hcl
-resource "aws_instance" "web" {
-  count = 3
-  
-  ami           = "ami-0123456789abcdef0"  # Example AMI ID
-  instance_type = "t2.micro"
-  tags = {
-    Name = "web-${count.index + 1}"
+resource "azurerm_linux_virtual_machine" "web" {
+  count               = 2
+  name                = "myvm-${count.index}"
+  resource_group_name = "test-rg"
+  location            = "uksouth"
+  size                = "Standard_B1s"
+
+  admin_username      = "azureuser"
+
+  network_interface_ids = [
+    "/subscriptions/{subID}/resourceGroups/test-rg/providers/Microsoft.Network/networkInterfaces/myvm-${count.index}-nic"
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
   }
 }
 ```
 
 **Using `for_each`:**
 ```hcl
-resource "aws_instance" "web" {
+resource "azurerm_linux_virtual_machine" "web" {
   for_each = toset(["web-1", "web-2", "web-3"])
   
   ami           = "ami-0123456789abcdef0"  # Example AMI ID
@@ -197,31 +224,72 @@ resource "aws_instance" "web" {
     Name = each.key
   }
 }
+
+resource "azurerm_linux_virtual_machine" "web" {
+  for_each = toset(["web-1", "web-2", "web-3"])
+  name                = "${each.value}-nic"
+  resource_group_name = "test-rg"
+  location            = "uksouth"
+  size                = "Standard_B1s"
+
+  admin_username      = "azureuser"
+
+  network_interface_ids = [
+    "/subscriptions/{subID}/resourceGroups/test-rg/providers/Microsoft.Network/networkInterfaces/myvm-${each.value}-nic"
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
+  }
+}
+
 ```
 
 ### Example 2: Different Instance Types
 
 **Using `for_each` (better choice):**
 ```hcl
-resource "aws_instance" "web" {
+resource "azurerm_linux_virtual_machine" "web" {
   for_each = {
-    frontend = "t3.medium"
-    backend  = "t3.large"
-    cache    = "t3.small"
+    frontend = "Standard_B2s"
+    backend  = "Standard_D2s_v3"
+    cache    = "Standard_B1ms"
   }
   
-  ami           = "ami-0123456789abcdef0"  # Example AMI ID
-  instance_type = each.value
-  tags = {
-    Name   = each.key
-    Role   = each.key
-    Type   = each.value
+  name                = each.key
+  resource_group_name = "test-rg"
+  location            = "uksouth"
+  size                = each.value
+  admin_username      = "azureuser"
+
+  network_interface_ids = [
+    azurerm_network_interface.webnic[each.key].id
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
   }
 }
 ```
 
 **Why `for_each` here?**
-- Each instance has unique configuration
+- Each virtual machine has unique configuration
 - Names map to roles (frontend, backend, cache)
 - Removing one doesn't affect others' addresses
 
@@ -244,12 +312,12 @@ resource "aws_instance" "web" {
 
 ```hcl
 # ❌ This will ERROR
-resource "aws_instance" "web" {
+resource "azurerm_linux_virtual_machine" "web" {
   for_each = ["web-1", "web-2"]  # List, not set!
 }
 
 # ✅ Correct - convert to set
-resource "aws_instance" "web" {
+resource "azurerm_linux_virtual_machine" "web" {
   for_each = toset(["web-1", "web-2"])
 }
 ```
@@ -258,7 +326,7 @@ resource "aws_instance" "web" {
 
 ```hcl
 # ❌ ERROR: Cannot use both count and for_each
-resource "aws_instance" "web" {
+resource "azurerm_linux_virtual_machine" "web" {
   count    = 3
   for_each = { a = "b" }
 }
@@ -270,23 +338,23 @@ resource "aws_instance" "web" {
 
 ```hcl
 # Initial state with count
-resource "aws_instance" "web" {
+resource "azurerm_linux_virtual_machine" "web" {
   count = 2
-  # Creates: aws_instance.web[0], aws_instance.web[1]
+  # Creates: azurerm_linux_virtual_machine.web[0], azurerm_linux_virtual_machine.web[1]
 }
 
 # Changing to for_each
-resource "aws_instance" "web" {
+resource "azurerm_linux_virtual_machine" "web" {
   for_each = toset(["web-1", "web-2"])
-  # Creates: aws_instance.web["web-1"], aws_instance.web["web-2"]
+  # Creates: azurerm_linux_virtual_machine.web["web-1"], azurerm_linux_virtual_machine.web["web-2"]
 }
 ```
 
 **This will cause Terraform to destroy old resources and create new ones.**  
 **Solution:** Use `terraform state mv` to migrate:
 ```bash
-terraform state mv 'aws_instance.web[0]' 'aws_instance.web["web-1"]'
-terraform state mv 'aws_instance.web[1]' 'aws_instance.web["web-2"]'
+terraform state mv 'azurerm_linux_virtual_machine.web[0]' 'azurerm_linux_virtual_machine.web["web-1"]'
+terraform state mv 'azurerm_linux_virtual_machine.web[1]' 'azurerm_linux_virtual_machine.web["web-2"]'
 ```
 
 ---
@@ -302,13 +370,13 @@ variable "server_names" {
 }
 
 # Option 1: Convert list to set
-resource "aws_instance" "web" {
+resource "azurerm_linux_virtual_machine" "web" {
   for_each = toset(var.server_names)
   # ...
 }
 
 # Option 2: Convert list to map with index
-resource "aws_instance" "web" {
+resource "azurerm_linux_virtual_machine" "web" {
   for_each = {
     for idx, name in var.server_names : name => idx
   }
@@ -319,7 +387,7 @@ resource "aws_instance" "web" {
 ### Converting Map to `count`
 
 ```hcl
-variable "instances" {
+variable "vms" {
   type = map(string)
   default = {
     web-1 = "t2.micro"
@@ -328,13 +396,12 @@ variable "instances" {
 }
 
 # Convert map to count (loses key names)
-resource "aws_instance" "web" {
-  count = length(var.instances)
-  
-  ami           = "ami-0123456789abcdef0"  # Example AMI ID
-  instance_type = values(var.instances)[count.index]
+resource "azurerm_linux_virtual_machine" "web" {
+  count = length(var.vms)
+
+  size = values(var.vms)[count.index]
   tags = {
-    Name = keys(var.instances)[count.index]
+    Name = keys(var.vms)[count.index]
   }
 }
 ```
@@ -350,20 +417,20 @@ resource "aws_instance" "web" {
 ```hcl
 variable "regions" {
   type = set(string)
-  default = ["us-east-1", "us-west-2", "eu-west-1"]
+  default = ["uksouth", "ukwest"]
 }
 
-resource "aws_s3_bucket" "logs" {
+resource "azurerm_storage_account" "logs" {
   for_each = var.regions
   
-  bucket = "company-logs-${each.value}"
+  name = "company-logs-${each.value}"
   
   # Use provider alias for each region
-  provider = aws.region[each.value]
+  provider = azurerm.region[each.value]
 }
 ```
 
-**Why `for_each`?** Each bucket has unique name based on region key.
+**Why `for_each`?** Each storage account has unique name based on region key.
 
 ---
 
@@ -383,18 +450,11 @@ locals {
   }
 }
 
-resource "aws_security_group_rule" "ingress" {
+resource "azurerm_network_security_group" "ingress" {
   for_each = {
     for sg_name, sg_config in local.security_groups :
     sg_name => sg_config
   }
-  
-  type              = "ingress"
-  security_group_id = aws_security_group.main[each.key].id
-  from_port         = each.value.ports[0]
-  to_port           = each.value.ports[0]
-  protocol          = "tcp"
-  cidr_blocks       = [each.value.cidr]
 }
 ```
 
@@ -404,15 +464,14 @@ resource "aws_security_group_rule" "ingress" {
 
 ```hcl
 # Using count (simpler for boolean)
-variable "enable_monitoring" {
+variable "enabled_for_disk_encryption" {
   type    = bool
   default = true
 }
 
-resource "aws_cloudwatch_alarm" "cpu" {
-  count = var.enable_monitoring ? 1 : 0
+resource "azurerm_key_vault" "main" {
+  count = var.enabled_for_disk_encryption ? 1 : 0
   
-  alarm_name = "high-cpu"
   # ...
 }
 
@@ -423,12 +482,12 @@ variable "environments" {
     region  = string
   }))
   default = {
-    prod = { enabled = true, region = "us-east-1" }
-    dev  = { enabled = false, region = "us-west-2" }
+    prod = { enabled = true, region = "uksouth" }
+    dev  = { enabled = false, region = "ukwest" }
   }
 }
 
-resource "aws_instance" "app" {
+resource "azurerm_key_vault" "main" {
   for_each = {
     for k, v in var.environments : k => v
     if v.enabled
@@ -443,7 +502,7 @@ resource "aws_instance" "app" {
 ## 9. Exam-Style Practice Questions
 
 ### Question 1
-You need to create 5 identical EC2 instances. Which approach is simplest?
+You need to create 5 identical VMs. Which approach is simplest?
 A) `for_each` with a set
 B) `count = 5`
 C) `for_each` with a map
@@ -500,9 +559,9 @@ Answer: **B** - `for_each` is better for maps with unique keys because removing 
 
 ### Question 5
 What is the correct syntax to reference a resource created with `for_each`?
-A) `aws_instance.web[0]`
-B) `aws_instance.web["web-1"]`
-C) `aws_instance.web.web-1`
+A) `azurerm_linux_virtual_machine.web[0]`
+B) `azurerm_linux_virtual_machine.web["web-1"]`
+C) `azurerm_linux_virtual_machine.web.web-1`
 D) Both A and B work
 
 <details>
